@@ -32,7 +32,15 @@
       inherit (pkgs) lib;
 
       craneLib = crane.lib.${system};
-      src = craneLib.cleanCargoSource (craneLib.path ./.);
+
+      markdownFilter = path: _type: builtins.match ".*md$" path != null;
+      markdownOrCargo = path: type:
+        (markdownFilter path type) || (craneLib.filterCargoSources path type);
+
+      src = lib.cleanSourceWith {
+        src = craneLib.path ./.; # The original, unfiltered source
+        filter = markdownOrCargo;
+      };
 
       # Common arguments can be set here to avoid repeating them later
       commonArgs = {
@@ -87,6 +95,16 @@
         my-crate-fmt = craneLib.cargoFmt {
           inherit src;
         };
+
+        # Run tests with cargo-nextest
+        # Consider setting `doCheck = false` on `my-crate` if you do not want
+        # the tests to run twice
+        my-crate-nextest = craneLib.cargoNextest (commonArgs
+          // {
+            inherit cargoArtifacts;
+            partitions = 1;
+            partitionType = "count";
+          });
       };
 
       packages =
