@@ -5,6 +5,7 @@
 #![warn(clippy::nursery)]
 
 mod cli;
+mod generate;
 
 fn main() {
     let args = cli::parse();

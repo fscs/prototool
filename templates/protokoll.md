@@ -1,0 +1,57 @@
+---
+title: "Protokoll vom {{date}}"
+date: "{{date_machine}}"
+---
+
+<details>
+<summary>Anwesenheitsliste<summary>
+
+##### Anwesende Räte
+
+#### Abwesende Räte
+
+#### Entschuldigte Räte
+
+#### Gäste
+
+</details>
+
+## Top 0 : Regularia
+
+Protokollant: 
+Redeleitung: 
+Startzeit: 
+Endzeit: 
+Wir sind mit n von nmax Räten beschlussfähig
+Wir nehmen die unten aufgelistete Topliste einstimmig an
+Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+
+## Top 1: Berichte, Mail und Post
+
+## Berichte
+
+## Mail
+
+## Briefpost
+
+## ToDo's
+
+_Top endet um T Uhr._
+{% for top in tops %}
+## Top {{ loop.index0 + 2 }}: {{top.name}}
+{% for antrag in top.anträge %}
+### Antrag: {{antrag.titel}}
+{{antrag.antragstext}}
+
+{{antrag.begründung}}
+{% endfor %}
+_Top endet um T Uhr._
+{% endfor %}
+## Top {{tops|length + 2}}: Verschiedenes
+
+### Veranstaltungen
+
+### Sonstiges
+
+_Top endet um T Uhr._
+
