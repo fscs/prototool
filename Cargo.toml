@@ -12,6 +12,7 @@ serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.114"
 askama = "0.12.1"
 tempfile = "3.10.1"
+owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
