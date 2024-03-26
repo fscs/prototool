@@ -1,7 +1,15 @@
 use anyhow::{bail, Context, Result};
+use askama::Template;
+use chrono::{DateTime, Local};
 
 use std::fs;
 use std::path::{Path, PathBuf};
+
+#[derive(Template)]
+#[template(path = "../templates/post.md")]
+pub struct PostTemplate {
+    date_machine: String,
+}
 
 fn find_content_dir(root: &Path, lang: &str) -> PathBuf {
     let mut result = root.to_owned();
@@ -47,12 +55,30 @@ pub fn edit(path: &Path, editor: &str) -> Result<()> {
     Ok(())
 }
 
+pub fn write_post_template(path: &Path, date: DateTime<Local>) -> Result<()> {
+    let date_formatted = date.format("%Y-%m-%dT%H:%M:%S");
+
+    let template = PostTemplate {
+        date_machine: date_formatted.to_string(),
+    };
+
+    let result = template.render().context("failed to render post template")?;
+
+    fs::write(path, result).context("failed to write post template")?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use askama::Template;
     use pretty_assertions::assert_eq;
-    use std::fs;
     use tempfile::tempdir;
+    
+    use std::fs;
+    
+    use super::PostTemplate;
 
     #[test]
     fn content_dir_doesnt_exist() {
@@ -74,5 +100,16 @@ mod tests {
         
         let expected = content_dir.join("news/test.md");
         assert_eq!(result, expected)
+    }
+    
+    static POST: &'static str = include_str!("../tests/post.md");
+
+    #[test]
+    fn post_template() {
+        let template = PostTemplate {
+            date_machine: "2022-05-27T07:30:15".to_string(),
+        };
+
+        assert_eq!(template.render().unwrap(), POST);
     }
 }
