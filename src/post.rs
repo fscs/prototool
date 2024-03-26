@@ -3,7 +3,13 @@ use anyhow::{bail, Context, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use super::find_content_dir;
+fn find_content_dir(root: &Path, lang: &str) -> PathBuf {
+    let mut result = root.to_owned();
+    result.push("content");
+    result.push(lang);
+
+    result
+}
 
 pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
     let content_dir = find_content_dir(root, lang);
@@ -27,6 +33,18 @@ pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
     fs::write(&target_path, "").context("unable to create file")?;
 
     Ok(target_path)
+}
+
+pub fn edit(path: &Path, editor: &str) -> Result<()> {
+    // Spawn editor process
+    let mut cmd = std::process::Command::new(editor)
+        .arg(path)
+        .spawn()
+        .context("editor {editor} not found")?;
+
+    cmd.wait()?;
+
+    Ok(())
 }
 
 #[cfg(test)]

@@ -6,13 +6,14 @@
 
 mod cli;
 mod generate;
-mod newpost;
+mod post;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use owo_colors::OwoColorize;
 
-use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+
+use cli::Runnable;
 
 fn main() -> ExitCode {
     let args = cli::parse();
@@ -33,22 +34,7 @@ fn main() -> ExitCode {
 
 fn run(command: cli::Command) -> Result<()> {
     match command {
-        cli::Command::GenerateCommand(_) => todo!(),
-        cli::Command::NewCommand(subcommand) => {
-            let cwd = std::env::current_dir().context("unable to determine working directory")?;
-            
-            let post_path = newpost::create_post(&cwd, &subcommand.lang, subcommand.path.as_str())?;
-            
-            println!("Created new post at {}", post_path.to_string_lossy());
-            Ok(())
-        }
+        cli::Command::GenerateCommand(x) => x.run(),
+        cli::Command::NewCommand(x) => x.run(),
     }
-}
-
-fn find_content_dir(root: &Path, lang: &str) -> PathBuf {
-    let mut result = root.to_owned();
-    result.push("content");
-    result.push(lang);
-
-    result
 }
