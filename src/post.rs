@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use askama::Template;
-use chrono::{DateTime, Local};
+use chrono::{NaiveDateTime, Local};
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -55,7 +55,7 @@ pub fn edit(path: &Path, editor: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn write_post_template(path: &Path, date: DateTime<Local>) -> Result<()> {
+pub fn write_post_template(path: &Path, date: NaiveDateTime) -> Result<()> {
     let date_formatted = date.format("%Y-%m-%dT%H:%M:%S");
 
     let template = PostTemplate {
@@ -75,6 +75,7 @@ mod tests {
     use askama::Template;
     use pretty_assertions::assert_eq;
     use tempfile::tempdir;
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     
     use std::fs;
     
@@ -111,5 +112,17 @@ mod tests {
         };
 
         assert_eq!(template.render().unwrap(), POST);
+    }
+
+    #[test]
+    fn write_post_template() {
+        let tmpfile = tempfile::NamedTempFile::new().unwrap();
+        let time = NaiveTime::from_hms_opt(7, 30, 15).unwrap();
+        let date = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
+        let datetime = NaiveDateTime::new(date, time);
+
+        super::write_post_template(tmpfile.path(), datetime).unwrap();
+
+        assert_eq!(fs::read_to_string(tmpfile).unwrap(), POST);
     }
 }
