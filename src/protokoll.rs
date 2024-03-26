@@ -39,8 +39,8 @@ mod tests {
     use askama::Template;
     use pretty_assertions::assert_eq;
 
-    static PROTOKOLL_NO_TOPS: &'static str = include_str!("../../tests/protokoll-no-tops.md");
-    static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../../tests/protokoll-with-tops.md");
+    static PROTOKOLL_NO_TOPS: &'static str = include_str!("../tests/protokoll-no-tops.md");
+    static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../tests/protokoll-with-tops.md");
 
     #[test]
     fn render_without_tops() {
