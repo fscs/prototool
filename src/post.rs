@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use askama::Template;
-use chrono::{NaiveDateTime, Local};
+use chrono::NaiveDateTime;
 
 use std::fs;
 use std::path::{Path, PathBuf};

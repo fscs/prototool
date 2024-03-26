@@ -1,18 +1,54 @@
+use anyhow::{Context, Result};
 use askama::Template;
+use chrono::NaiveDateTime;
 use serde::Deserialize;
+use url::Url;
+
+use std::{fs, path::Path};
 
 #[derive(Debug, Deserialize)]
-struct Antrag {
+pub struct Antrag {
     pub titel: String,
     pub antragstext: String,
     pub begründung: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct Top {
+pub struct Top {
     pub position: i64,
     pub name: String,
     pub anträge: Vec<Antrag>,
+}
+
+pub fn fetch_current_tops(api_url: &str) -> Result<Vec<Top>> {
+    let baseurl = Url::parse(api_url).context("invalid base url '{api_url}")?;
+    let endpoint = baseurl.join("api/topmanager/current_tops")?;
+
+    let response = reqwest::blocking::get(endpoint).context("unable to fetch current tops")?;
+
+    let mut tops: Vec<Top> = response.json().context("failed to deserialize tops")?;
+
+    #[allow(clippy::unwrap_used)]
+    tops.sort_by(|a, b| a.position.partial_cmp(&b.position).unwrap());
+
+    Ok(tops)
+}
+
+pub fn write_protokoll_template(path: &Path, tops: Vec<Top>, datetime: &NaiveDateTime) -> Result<()> {
+    let date_machine = datetime.format("%Y-%m-%dT%H:%M:%S");
+    let date_human = datetime.format("%d.%m.%Y");
+
+    let template = ProtokollTemplate {
+        date_machine: date_machine.to_string(),
+        date: date_human.to_string(),
+        tops
+    };
+
+    let result = template.render().context("failed to render protokoll template")?;
+
+    fs::write(path, result).context("failed to write protokoll template")?;
+
+    Ok(())
 }
 
 #[derive(Debug, Template)]

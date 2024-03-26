@@ -1,9 +1,8 @@
 use anyhow::{Context, Result};
-use chrono::NaiveDateTime;
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
 
-use crate::post;
+use crate::{post, protokoll};
 
 pub trait Runnable {
     fn run(&self) -> Result<()>;
@@ -30,13 +29,52 @@ pub enum Command {
 
 #[derive(Debug, Args)]
 pub struct GenerateCommand {
-    #[arg(short = 'U', default_value = "https://fscs.hhu.de/api")]
+    /// Endpoint to fetch Tops from
+    #[arg(short = 'U', default_value = "https://fscs.hhu.de/")]
     pub endpoint_url: String,
+    /// Under which language the protokoll should be created
+    #[arg(short, long, default_value = "de")]
+    pub lang: String,
+    /// Open the protokoll for editing.  
+    /// Optionally takes the editor to use, falls back to $EDITOR otherwise
+    #[arg(long, short)]
+    pub edit: Option<Option<String>>,
 }
 
 impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
-        todo!()
+        let cwd = std::env::current_dir().context("unable to determine working directory")?;
+        println!(
+            "[{}] Fetching tops...",
+            "prototool".green(),
+        );
+        
+        let tops = protokoll::fetch_current_tops(&self.endpoint_url)?;
+        let now = chrono::Local::now().naive_local();
+
+        let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));
+
+        let file_path = post::create_post(&cwd, &self.lang, &path)?;
+        
+        println!(
+            "[{}] Created Protokoll at '{}'",
+            "prototool".green(),
+            file_path.to_string_lossy()
+        );
+
+        protokoll::write_protokoll_template(&file_path, tops, &now)?;
+        
+        if let Some(maybe_editor) = &self.edit {
+            let editor = match maybe_editor {
+                Some(x) => x.to_owned(),
+                None => std::env::var("EDITOR")
+                    .context("unable to determine editor. wasnt specified and $EDITOR isnt set")?,
+            };
+
+            post::edit(&file_path, &editor)?
+        }
+
+        Ok(())
     }
 }
 

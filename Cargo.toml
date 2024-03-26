@@ -14,7 +14,8 @@ askama = "0.12.1"
 tempfile = "3.10.1"
 owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 chrono = "0.4.35"
-reqwest = "0.12.2"
+reqwest = { version = "0.12.2", features = ["blocking", "json"] }
+url = "2.5.0"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
