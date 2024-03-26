@@ -5,7 +5,7 @@
 #![warn(clippy::nursery)]
 
 mod cli;
-mod generate;
+mod protokoll;
 mod post;
 
 use anyhow::Result;
