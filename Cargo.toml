@@ -1,5 +1,6 @@
 [package]
 name = "prototool"
+description = "Tool zum automatischen generieren von Protokollen und Website Posts"
 version = "0.1.0"
 edition = "2021"
 

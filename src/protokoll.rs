@@ -34,17 +34,23 @@ pub fn fetch_current_tops(api_url: &str) -> Result<Vec<Top>> {
     Ok(tops)
 }
 
-pub fn write_protokoll_template(path: &Path, tops: Vec<Top>, datetime: &NaiveDateTime) -> Result<()> {
+pub fn write_protokoll_template(
+    path: &Path,
+    tops: Vec<Top>,
+    datetime: &NaiveDateTime,
+) -> Result<()> {
     let date_machine = datetime.format("%Y-%m-%dT%H:%M:%S");
     let date_human = datetime.format("%d.%m.%Y");
 
     let template = ProtokollTemplate {
         date_machine: date_machine.to_string(),
         date: date_human.to_string(),
-        tops
+        tops,
     };
 
-    let result = template.render().context("failed to render protokoll template")?;
+    let result = template
+        .render()
+        .context("failed to render protokoll template")?;
 
     fs::write(path, result).context("failed to write protokoll template")?;
 
@@ -60,7 +66,8 @@ struct ProtokollTemplate {
 }
 
 mod filters {
-    pub fn length<T>(input: &Vec<T>) -> Result<usize, askama::Error>
+    // askama doesnt seem to have an array length method, wtf
+    pub const fn length<T>(input: &[T]) -> Result<usize, askama::Error>
     where
         T: Sized,
     {
@@ -73,7 +80,10 @@ mod filters {
 mod tests {
     use super::{Antrag, ProtokollTemplate, Top};
     use askama::Template;
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use pretty_assertions::assert_eq;
+
+    use std::fs;
 
     static PROTOKOLL_NO_TOPS: &'static str = include_str!("../tests/protokoll-no-tops.md");
     static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../tests/protokoll-with-tops.md");
@@ -81,8 +91,8 @@ mod tests {
     #[test]
     fn render_without_tops() {
         let template = ProtokollTemplate {
-            date: "18.5.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15.000Z".to_string(),
+            date: "27.05.2022".to_string(),
+            date_machine: "2022-05-27T07:30:15".to_string(),
             tops: vec![],
         };
 
@@ -92,8 +102,8 @@ mod tests {
     #[test]
     fn render_with_tops() {
         let template = ProtokollTemplate {
-            date: "18.5.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15.000Z".to_string(),
+            date: "27.05.2022".to_string(),
+            date_machine: "2022-05-27T07:30:15".to_string(),
             tops: vec![
                 Top {
                     name: "FZB: 25€ Blumen für Valentin".to_string(),
@@ -124,5 +134,45 @@ mod tests {
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_TOPS);
+    }
+
+    #[test]
+    fn write_protokoll_template() {
+        let tmpfile = tempfile::NamedTempFile::new().unwrap();
+        let time = NaiveTime::from_hms_opt(7, 30, 15).unwrap();
+        let date = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
+        let datetime = NaiveDateTime::new(date, time);
+
+        let tops = vec![
+            Top {
+                name: "FZB: 25€ Blumen für Valentin".to_string(),
+                position: 1,
+                anträge: vec![Antrag {
+                    titel: "Blumen für Valentin".to_string(),
+                    antragstext: "Wir möchten Blumen für Valentin kaufen".to_string(),
+                    begründung: "Weil wir Valentin toll finden".to_string(),
+                }],
+            },
+            Top {
+                name: "Volt Zapfanlage".to_string(),
+                position: 2,
+                anträge: vec![
+                    Antrag {
+                        titel: "Tank für Voltzapfanlage".to_string(),
+                        antragstext: "Der Tank soll im Keller installiert werden. ".to_string(),
+                        begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                    },
+                    Antrag {
+                        titel: "Hahn für Voltzapfanlage".to_string(),
+                        antragstext: "Der Hahn soll beim Telefon angebracht werden".to_string(),
+                        begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                    },
+                ],
+            },
+        ];
+
+        super::write_protokoll_template(tmpfile.path(), tops, &datetime).unwrap();
+
+        assert_eq!(fs::read_to_string(tmpfile).unwrap(), PROTOKOLL_WITH_TOPS);
     }
 }

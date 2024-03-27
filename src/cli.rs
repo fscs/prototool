@@ -27,6 +27,7 @@ pub enum Command {
     NewCommand(NewCommand),
 }
 
+/// Generate a new Protokoll
 #[derive(Debug, Args)]
 pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
@@ -44,18 +45,15 @@ pub struct GenerateCommand {
 impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
-        println!(
-            "[{}] Fetching tops...",
-            "prototool".green(),
-        );
-        
+        println!("[{}] Fetching tops...", "prototool".green(),);
+
         let tops = protokoll::fetch_current_tops(&self.endpoint_url)?;
         let now = chrono::Local::now().naive_local();
 
         let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));
 
         let file_path = post::create_post(&cwd, &self.lang, &path)?;
-        
+
         println!(
             "[{}] Created Protokoll at '{}'",
             "prototool".green(),
@@ -63,7 +61,7 @@ impl Runnable for GenerateCommand {
         );
 
         protokoll::write_protokoll_template(&file_path, tops, &now)?;
-        
+
         if let Some(maybe_editor) = &self.edit {
             let editor = match maybe_editor {
                 Some(x) => x.to_owned(),

@@ -5,8 +5,8 @@
 #![warn(clippy::nursery)]
 
 mod cli;
-mod protokoll;
 mod post;
+mod protokoll;
 
 use anyhow::Result;
 use owo_colors::OwoColorize;
@@ -24,7 +24,7 @@ fn main() -> ExitCode {
             eprintln!("{} {}", "[prototool]".red(), e,);
 
             if e.chain().len() > 1 {
-                eprintln!("\t{}", e.root_cause());
+                eprintln!("            {}", e.root_cause());
             }
 
             ExitCode::FAILURE

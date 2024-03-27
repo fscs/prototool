@@ -25,7 +25,7 @@ pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
     if !content_dir.exists() {
         bail!("content dir doesnt exist yet")
     }
-    
+
     let target_path = content_dir.join(target);
 
     let Some(category_path) = target_path.parent() else {
@@ -33,7 +33,7 @@ pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
     };
 
     fs::create_dir_all(category_path).context("unable to create category path")?;
-    
+
     if target_path.exists() {
         bail!("target path already exists");
     }
@@ -62,7 +62,9 @@ pub fn write_post_template(path: &Path, date: NaiveDateTime) -> Result<()> {
         date_machine: date_formatted.to_string(),
     };
 
-    let result = template.render().context("failed to render post template")?;
+    let result = template
+        .render()
+        .context("failed to render post template")?;
 
     fs::write(path, result).context("failed to write post template")?;
 
@@ -73,12 +75,12 @@ pub fn write_post_template(path: &Path, date: NaiveDateTime) -> Result<()> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use askama::Template;
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use pretty_assertions::assert_eq;
     use tempfile::tempdir;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-    
+
     use std::fs;
-    
+
     use super::PostTemplate;
 
     #[test]
@@ -94,15 +96,15 @@ mod tests {
     fn category_doesnt_exist() {
         let tmpdir = tempdir().unwrap();
         let content_dir = tmpdir.path().join("content/de/");
-        
+
         fs::create_dir_all(&content_dir).unwrap();
 
         let result = super::create_post(tmpdir.path(), "de", "news/test.md").unwrap();
-        
+
         let expected = content_dir.join("news/test.md");
         assert_eq!(result, expected)
     }
-    
+
     static POST: &'static str = include_str!("../tests/post.md");
 
     #[test]
