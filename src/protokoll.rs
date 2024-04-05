@@ -65,16 +65,6 @@ struct ProtokollTemplate {
     pub date_machine: String,
 }
 
-mod filters {
-    // askama doesnt seem to have an array length method, wtf
-    pub const fn length<T>(input: &[T]) -> Result<usize, askama::Error>
-    where
-        T: Sized,
-    {
-        Ok(input.len())
-    }
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {

@@ -47,7 +47,7 @@ _Top endet um T Uhr._
 {% endfor %}
 _Top endet um T Uhr._
 {% endfor %}
-## Top {{tops|length + 2}}: Verschiedenes
+## Top {{tops.len() + 2}}: Verschiedenes
 
 ### Veranstaltungen
 
