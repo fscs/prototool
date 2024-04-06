@@ -123,8 +123,8 @@ mod tests {
             ],
         };
 
-        println!("{}",template.render().unwrap());
-        
+        println!("{}", template.render().unwrap());
+
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_TOPS);
     }
 
@@ -137,26 +137,26 @@ mod tests {
 
         let tops = vec![
             Top {
-                name: "FZB: 25€ Blumen für Valentin".to_string(),
-                position: 1,
+                name: "Blumen für Valentin".to_string(),
+                weight: 1,
                 anträge: vec![Antrag {
                     titel: "Blumen für Valentin".to_string(),
-                    antragstext: "Wir möchten Blumen für Valentin kaufen".to_string(),
+                    antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                     begründung: "Weil wir Valentin toll finden".to_string(),
                 }],
             },
             Top {
                 name: "Volt Zapfanlage".to_string(),
-                position: 2,
+                weight: 2,
                 anträge: vec![
                     Antrag {
                         titel: "Tank für Voltzapfanlage".to_string(),
-                        antragstext: "Der Tank soll im Keller installiert werden. ".to_string(),
+                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                         begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
                     },
                     Antrag {
                         titel: "Hahn für Voltzapfanlage".to_string(),
-                        antragstext: "Der Hahn soll beim Telefon angebracht werden".to_string(),
+                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                         begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
                     },
                 ],
