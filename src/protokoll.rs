@@ -15,21 +15,21 @@ pub struct Antrag {
 
 #[derive(Debug, Deserialize)]
 pub struct Top {
-    pub position: i64,
+    pub weight: i64,
     pub name: String,
     pub anträge: Vec<Antrag>,
 }
 
 pub fn fetch_current_tops(api_url: &str) -> Result<Vec<Top>> {
     let baseurl = Url::parse(api_url).context("invalid base url '{api_url}")?;
-    let endpoint = baseurl.join("api/topmanager/current_tops")?;
+    let endpoint = baseurl.join("api/topmanager/current_tops/")?;
 
     let response = reqwest::blocking::get(endpoint).context("unable to fetch current tops")?;
 
     let mut tops: Vec<Top> = response.json().context("failed to deserialize tops")?;
 
     #[allow(clippy::unwrap_used)]
-    tops.sort_by(|a, b| a.position.partial_cmp(&b.position).unwrap());
+    tops.sort_by(|a, b| a.weight.partial_cmp(&b.weight).unwrap());
 
     Ok(tops)
 }
@@ -96,26 +96,26 @@ mod tests {
             date_machine: "2022-05-27T07:30:15".to_string(),
             tops: vec![
                 Top {
-                    name: "FZB: 25€ Blumen für Valentin".to_string(),
-                    position: 1,
+                    name: "Blumen für Valentin".to_string(),
+                    weight: 1,
                     anträge: vec![Antrag {
                         titel: "Blumen für Valentin".to_string(),
-                        antragstext: "Wir möchten Blumen für Valentin kaufen".to_string(),
+                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                         begründung: "Weil wir Valentin toll finden".to_string(),
                     }],
                 },
                 Top {
                     name: "Volt Zapfanlage".to_string(),
-                    position: 2,
+                    weight: 2,
                     anträge: vec![
                         Antrag {
                             titel: "Tank für Voltzapfanlage".to_string(),
-                            antragstext: "Der Tank soll im Keller installiert werden. ".to_string(),
+                            antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                             begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
                         },
                         Antrag {
                             titel: "Hahn für Voltzapfanlage".to_string(),
-                            antragstext: "Der Hahn soll beim Telefon angebracht werden".to_string(),
+                            antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                             begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
                         },
                     ],
@@ -123,6 +123,8 @@ mod tests {
             ],
         };
 
+        println!("{}",template.render().unwrap());
+        
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_TOPS);
     }
 

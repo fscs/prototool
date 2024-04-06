@@ -39,14 +39,23 @@ Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 _Top endet um T Uhr._
 {% for top in tops %}
 ## Top {{ loop.index0 + 2 }}: {{top.name}}
-{% for antrag in top.anträge %}
-### Antrag: {{antrag.titel}}
-{{antrag.antragstext}}
 
-{{antrag.begründung}}
-{% endfor %}
+{%~ for antrag in top.anträge -%}
+
+{%~ if top.anträge.len() > 1 ~%}
+### Antrag: {{ antrag.titel }}
+{%~ endif -%}
+  
+{{ antrag.begründung }}
+
+---
+{{antrag.antragstext}}
+---
+{% endfor ~%}
+
 _Top endet um T Uhr._
-{% endfor %}
+{% endfor ~%}
+
 ## Top {{tops.len() + 2}}: Verschiedenes
 
 ### Veranstaltungen
