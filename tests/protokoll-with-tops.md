@@ -67,7 +67,7 @@ _Top endet um T Uhr._
 
 ## Top 4: Verschiedenes
 
-### Veranstaltungen
+### Anstehende Veranstaltungen
 
 ### Sonstiges
 

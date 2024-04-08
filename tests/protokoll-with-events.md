@@ -7,15 +7,10 @@ date: "2022-05-27T07:30:15"
 <summary>Anwesenheitsliste<summary>
 
 #### Anwesende Räte
-- Valentin
-- Jonas "Kooptimus"
-- Marcel "Markal"
 
 #### Abwesende Räte
 
 #### Entschuldigte Räte
-- Elif
-- Australian
 
 #### Gäste
 
@@ -46,6 +41,8 @@ _Top endet um T Uhr._
 ## Top 2: Verschiedenes
 
 ### Anstehende Veranstaltungen
+- 05.04. Spieleabend 17:00 Uhr 33er
+- 12.04. Semestergrillen 17:00 Uhr Grillplätze bei der Mathe
 
 ### Sonstiges
 

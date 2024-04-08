@@ -8,6 +8,7 @@ mod cli;
 mod post;
 mod raete;
 mod protokoll;
+mod events;
 
 use anyhow::Result;
 use owo_colors::OwoColorize;

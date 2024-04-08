@@ -4,7 +4,7 @@ use owo_colors::OwoColorize;
 use reqwest::blocking::Client;
 use url::Url;
 
-use crate::{post, protokoll, raete};
+use crate::{events, post, protokoll, raete};
 
 pub trait Runnable {
     fn run(&self) -> Result<()>;
@@ -47,17 +47,21 @@ pub struct GenerateCommand {
 impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
-        println!("[{}] Fetching tops...", "prototool".green(),);
 
         let base_url = Url::parse(&self.endpoint_url).context("unable to parse endpoint url")?;
         let client = Client::new();
 
-        let tops = protokoll::fetch_current_tops(&base_url)?;
+        println!("[{}] Fetching tops...", "prototool".green(),);
+        let tops = protokoll::fetch_current_tops(&base_url, &client)?;
         let now = chrono::Local::now().naive_local();
 
+        println!("[{}] Fetching räte and withdrawals...", "prototool".green(),);
         let persons = raete::fetch_persons(&base_url, &client, &now)?;
         let abmeldungen = raete::fetch_abmeldungen(&base_url, &client)?;
         let räte = raete::determine_present_räte(&persons, &abmeldungen);
+
+        println!("[{}] Fetching events...", "prototool".green(),);
+        let events = events::fetch_calendar_events(&base_url, &client)?;
 
         let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));
 
@@ -69,7 +73,7 @@ impl Runnable for GenerateCommand {
             file_path.to_string_lossy()
         );
 
-        protokoll::write_protokoll_template(&file_path, tops, räte, &now)?;
+        protokoll::write_protokoll_template(&file_path, tops, räte, events, &now)?;
 
         if let Some(maybe_editor) = &self.edit {
             let editor = match maybe_editor {

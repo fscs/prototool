@@ -68,7 +68,10 @@ _Top endet um T Uhr._
 
 ## Top {{tops.len() + 2}}: Verschiedenes
 
-### Veranstaltungen
+### Anstehende Veranstaltungen
+{%- for event in events ~%}
+- {{ event.start.format("%d.%m.") }} {{ event.title }} {{ event.start.format("%H:%M")}} Uhr {{ event.location }}
+{%- endfor %}
 
 ### Sonstiges
 

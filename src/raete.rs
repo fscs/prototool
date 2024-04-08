@@ -27,13 +27,13 @@ pub struct Abmeldung {
 pub fn fetch_persons(api_url: &Url, client: &Client, datetime: &NaiveDateTime) -> Result<Vec<Person>> {
    let endpoint = api_url.join("api/person/by-role/")?;
 
-   let datestr = datetime.to_string();
+   let datestr = datetime.format("%Y-%m-%d").to_string();
    let mut body = HashMap::new();
    body.insert("rolle", "Rat");
    body.insert("anfangsdatum", &datestr);
    body.insert("ablaufdatum", &datestr);
 
-   let response = client.put(endpoint).json(&body).send().context("unable to fetch räte")?;
+   let response = client.get(endpoint).json(&body).send().context("unable to fetch räte")?;
    let persons = response.json().context("unable to deserialize räte")?;
 
    Ok(persons)
