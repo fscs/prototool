@@ -6,7 +6,7 @@ date: "2022-05-27T07:30:15"
 <details>
 <summary>Anwesenheitsliste<summary>
 
-##### Anwesende Räte
+#### Anwesende Räte
 
 #### Abwesende Räte
 

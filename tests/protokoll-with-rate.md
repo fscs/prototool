@@ -7,10 +7,15 @@ date: "2022-05-27T07:30:15"
 <summary>Anwesenheitsliste<summary>
 
 #### Anwesende Räte
+- Valentin
+- Jonas "Kooptimus"
+- Marcel "Markal"
 
 #### Abwesende Räte
 
 #### Entschuldigte Räte
+- Elif
+- Australian
 
 #### Gäste
 

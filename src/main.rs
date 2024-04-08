@@ -6,6 +6,7 @@
 
 mod cli;
 mod post;
+mod raete;
 mod protokoll;
 
 use anyhow::Result;

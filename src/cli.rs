@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
+use reqwest::blocking::Client;
 use url::Url;
 
-use crate::{post, protokoll};
+use crate::{post, protokoll, raete};
 
 pub trait Runnable {
     fn run(&self) -> Result<()>;
@@ -49,9 +50,14 @@ impl Runnable for GenerateCommand {
         println!("[{}] Fetching tops...", "prototool".green(),);
 
         let base_url = Url::parse(&self.endpoint_url).context("unable to parse endpoint url")?;
+        let client = Client::new();
 
         let tops = protokoll::fetch_current_tops(&base_url)?;
         let now = chrono::Local::now().naive_local();
+
+        let persons = raete::fetch_persons(&base_url, &client, &now)?;
+        let abmeldungen = raete::fetch_abmeldungen(&base_url, &client)?;
+        let räte = raete::determine_present_räte(&persons, &abmeldungen);
 
         let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));
 
@@ -63,7 +69,7 @@ impl Runnable for GenerateCommand {
             file_path.to_string_lossy()
         );
 
-        protokoll::write_protokoll_template(&file_path, tops, &now)?;
+        protokoll::write_protokoll_template(&file_path, tops, räte, &now)?;
 
         if let Some(maybe_editor) = &self.edit {
             let editor = match maybe_editor {

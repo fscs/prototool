@@ -6,6 +6,8 @@ use url::Url;
 
 use std::{fs, path::Path};
 
+use crate::raete::Rat;
+
 #[derive(Debug, Deserialize)]
 pub struct Antrag {
     pub titel: String,
@@ -36,6 +38,7 @@ pub fn fetch_current_tops(api_url: &Url) -> Result<Vec<Top>> {
 pub fn write_protokoll_template(
     path: &Path,
     tops: Vec<Top>,
+    räte: Vec<Rat>,
     datetime: &NaiveDateTime,
 ) -> Result<()> {
     let date_machine = datetime.format("%Y-%m-%dT%H:%M:%S");
@@ -45,6 +48,7 @@ pub fn write_protokoll_template(
         date_machine: date_machine.to_string(),
         date: date_human.to_string(),
         tops,
+        räte,
     };
 
     let result = template
@@ -60,6 +64,7 @@ pub fn write_protokoll_template(
 #[template(path = "../templates/protokoll.md")]
 struct ProtokollTemplate {
     pub tops: Vec<Top>,
+    pub räte: Vec<Rat>,
     pub date: String,
     pub date_machine: String,
 }
@@ -67,6 +72,8 @@ struct ProtokollTemplate {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use crate::raete::Rat;
+
     use super::{Antrag, ProtokollTemplate, Top};
     use askama::Template;
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
@@ -76,6 +83,7 @@ mod tests {
 
     static PROTOKOLL_NO_TOPS: &'static str = include_str!("../tests/protokoll-no-tops.md");
     static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../tests/protokoll-with-tops.md");
+    static PROTOKOLL_WITH_RÄTE: &'static str = include_str!("../tests/protokoll-with-rate.md");
 
     #[test]
     fn render_without_tops() {
@@ -83,6 +91,7 @@ mod tests {
             date: "27.05.2022".to_string(),
             date_machine: "2022-05-27T07:30:15".to_string(),
             tops: vec![],
+            räte: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_NO_TOPS);
@@ -93,6 +102,7 @@ mod tests {
         let template = ProtokollTemplate {
             date: "27.05.2022".to_string(),
             date_machine: "2022-05-27T07:30:15".to_string(),
+            räte: vec![],
             tops: vec![
                 Top {
                     name: "Blumen für Valentin".to_string(),
@@ -122,9 +132,40 @@ mod tests {
             ],
         };
 
-        println!("{}", template.render().unwrap());
-
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_TOPS);
+    }
+
+    #[test]
+    fn render_with_räte() {
+        let template = ProtokollTemplate {
+            date: "27.05.2022".to_string(),
+            date_machine: "2022-05-27T07:30:15".to_string(),
+            räte: vec![
+                Rat {
+                    name: "Valentin".to_string(),
+                    abgemeldet: false
+                },
+                Rat {
+                    name: "Jonas \"Kooptimus\"".to_string(),
+                    abgemeldet: false
+                },
+                Rat {
+                    name: "Marcel \"Markal\"".to_string(),
+                    abgemeldet: false
+                },
+                Rat {
+                    name: "Elif".to_string(),
+                    abgemeldet: true
+                },
+                Rat {
+                    name: "Australian".to_string(),
+                    abgemeldet: true
+                },
+            ],
+            tops: vec![],
+        };
+
+        assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_RÄTE);
     }
 
     #[test]
@@ -162,7 +203,7 @@ mod tests {
             },
         ];
 
-        super::write_protokoll_template(tmpfile.path(), tops, &datetime).unwrap();
+        super::write_protokoll_template(tmpfile.path(), tops, vec![], &datetime).unwrap();
 
         assert_eq!(fs::read_to_string(tmpfile).unwrap(), PROTOKOLL_WITH_TOPS);
     }

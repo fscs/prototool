@@ -6,11 +6,21 @@ date: "{{date_machine}}"
 <details>
 <summary>Anwesenheitsliste<summary>
 
-##### Anwesende Räte
+#### Anwesende Räte
+{%~ for rat in räte -%}
+{%- if !rat.abgemeldet -%}
+- {{ rat.name }}
+{% endif -%}
+{%- endfor ~%}
 
 #### Abwesende Räte
 
 #### Entschuldigte Räte
+{%~ for rat in räte -%}
+{%- if rat.abgemeldet -%}
+- {{ rat.name }}
+{% endif -%}
+{%- endfor ~%}
 
 #### Gäste
 

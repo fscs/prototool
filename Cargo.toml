@@ -17,7 +17,7 @@ owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 chrono = "0.4.35"
 reqwest = { version = "0.12.2", features = ["blocking", "json"] }
 url = "2.5.0"
-uuid = { version = "1.8.0", features = ["v4"] }
+uuid = { version = "1.8.0", features = ["v4", "serde"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
