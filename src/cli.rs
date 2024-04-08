@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
+use url::Url;
 
 use crate::{post, protokoll};
 
@@ -47,7 +48,9 @@ impl Runnable for GenerateCommand {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
         println!("[{}] Fetching tops...", "prototool".green(),);
 
-        let tops = protokoll::fetch_current_tops(&self.endpoint_url)?;
+        let base_url = Url::parse(&self.endpoint_url).context("unable to parse endpoint url")?;
+
+        let tops = protokoll::fetch_current_tops(&base_url)?;
         let now = chrono::Local::now().naive_local();
 
         let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));

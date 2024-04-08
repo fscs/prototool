@@ -20,9 +20,8 @@ pub struct Top {
     pub anträge: Vec<Antrag>,
 }
 
-pub fn fetch_current_tops(api_url: &str) -> Result<Vec<Top>> {
-    let baseurl = Url::parse(api_url).context("invalid base url '{api_url}")?;
-    let endpoint = baseurl.join("api/topmanager/current_tops/")?;
+pub fn fetch_current_tops(api_url: &Url) -> Result<Vec<Top>> {
+    let endpoint = api_url.join("api/topmanager/current_tops/")?;
 
     let response = reqwest::blocking::get(endpoint).context("unable to fetch current tops")?;
 
