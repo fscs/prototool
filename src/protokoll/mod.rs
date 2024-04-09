@@ -1,40 +1,16 @@
 use anyhow::{Context, Result};
 use askama::Template;
 use chrono::NaiveDateTime;
-use reqwest::blocking::Client;
-use serde::Deserialize;
-use url::Url;
 
 use std::{fs, path::Path};
 
-use crate::{events::Event, raete::Rat};
+use events::Event;
+use raete::Rat;
+use tops::{Antrag, Top};
 
-#[derive(Debug, Deserialize)]
-pub struct Antrag {
-    pub titel: String,
-    pub antragstext: String,
-    pub begründung: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Top {
-    pub weight: i64,
-    pub name: String,
-    pub anträge: Vec<Antrag>,
-}
-
-pub fn fetch_current_tops(api_url: &Url, client: &Client) -> Result<Vec<Top>> {
-    let endpoint = api_url.join("api/topmanager/current_tops/")?;
-
-    let response = client.get(endpoint).send().context("unable to fetch current tops")?;
-
-    let mut tops: Vec<Top> = response.json().context("failed to deserialize tops")?;
-
-    #[allow(clippy::unwrap_used)]
-    tops.sort_by(|a, b| a.weight.partial_cmp(&b.weight).unwrap());
-
-    Ok(tops)
-}
+pub mod events;
+pub mod raete;
+pub mod tops;
 
 pub fn write_protokoll_template(
     path: &Path,
@@ -76,19 +52,20 @@ struct ProtokollTemplate {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use crate::{events::Event, raete::Rat};
+    use crate::protokoll::{events::Event, raete::Rat};
 
     use super::{Antrag, ProtokollTemplate, Top};
     use askama::Template;
-    use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
     use pretty_assertions::assert_eq;
 
     use std::fs;
 
-    static PROTOKOLL_NO_TOPS: &'static str = include_str!("../tests/protokoll-no-tops.md");
-    static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../tests/protokoll-with-tops.md");
-    static PROTOKOLL_WITH_RÄTE: &'static str = include_str!("../tests/protokoll-with-rate.md");
-    static PROTOKOLL_WITH_EVENTS: &'static str = include_str!("../tests/protokoll-with-events.md");
+    static PROTOKOLL_NO_TOPS: &'static str = include_str!("../../tests/protokoll-no-tops.md");
+    static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../../tests/protokoll-with-tops.md");
+    static PROTOKOLL_WITH_RÄTE: &'static str = include_str!("../../tests/protokoll-with-rate.md");
+    static PROTOKOLL_WITH_EVENTS: &'static str =
+        include_str!("../../tests/protokoll-with-events.md");
 
     #[test]
     fn render_without_tops() {

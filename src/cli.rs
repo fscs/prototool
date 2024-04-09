@@ -4,7 +4,8 @@ use owo_colors::OwoColorize;
 use reqwest::blocking::Client;
 use url::Url;
 
-use crate::{events, post, protokoll, raete};
+use crate::post;
+use crate::protokoll::{self, events, raete, tops};
 
 pub trait Runnable {
     fn run(&self) -> Result<()>;
@@ -52,7 +53,7 @@ impl Runnable for GenerateCommand {
         let client = Client::new();
 
         println!("[{}] Fetching tops...", "prototool".green(),);
-        let tops = protokoll::fetch_current_tops(&base_url, &client)?;
+        let tops = tops::fetch_current_tops(&base_url, &client)?;
         let now = chrono::Local::now().naive_local();
 
         println!("[{}] Fetching räte and withdrawals...", "prototool".green(),);
