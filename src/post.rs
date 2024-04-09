@@ -19,7 +19,7 @@ fn find_content_dir(root: &Path, lang: &str) -> PathBuf {
     result
 }
 
-pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
+pub fn create_post(root: &Path, lang: &str, target: &str, force: bool) -> Result<PathBuf> {
     let content_dir = find_content_dir(root, lang);
 
     if !content_dir.exists() {
@@ -34,7 +34,7 @@ pub fn create_post(root: &Path, lang: &str, target: &str) -> Result<PathBuf> {
 
     fs::create_dir_all(category_path).context("unable to create category path")?;
 
-    if target_path.exists() {
+    if target_path.exists() && !force {
         bail!("target path already exists");
     }
 
@@ -87,7 +87,7 @@ mod tests {
     fn content_dir_doesnt_exist() {
         let tmpdir = tempdir().unwrap();
 
-        let result = super::create_post(tmpdir.path(), "de", "news/test.md");
+        let result = super::create_post(tmpdir.path(), "de", "news/test.md", false);
 
         assert!(result.is_err())
     }
@@ -99,7 +99,7 @@ mod tests {
 
         fs::create_dir_all(&content_dir).unwrap();
 
-        let result = super::create_post(tmpdir.path(), "de", "news/test.md").unwrap();
+        let result = super::create_post(tmpdir.path(), "de", "news/test.md", false).unwrap();
 
         let expected = content_dir.join("news/test.md");
         assert_eq!(result, expected)

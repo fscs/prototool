@@ -43,6 +43,9 @@ pub struct GenerateCommand {
     /// Optionally takes the editor to use, falls back to $EDITOR otherwise
     #[arg(long, short)]
     pub edit: Option<Option<String>>,
+    /// Force creation, even if a file already exist
+    #[arg(long, short)]
+    pub force: bool,
 }
 
 impl Runnable for GenerateCommand {
@@ -66,7 +69,7 @@ impl Runnable for GenerateCommand {
 
         let path = format!("protokolle/{}.md", now.format("%Y-%m-%d"));
 
-        let file_path = post::create_post(&cwd, &self.lang, &path)?;
+        let file_path = post::create_post(&cwd, &self.lang, &path, self.force)?;
 
         println!(
             "[{}] Created Protokoll at '{}'",
@@ -102,13 +105,16 @@ pub struct NewCommand {
     /// Optionally takes the editor to use, falls back to $EDITOR otherwise
     #[arg(long, short)]
     pub edit: Option<Option<String>>,
+    /// Force creation, even if a file already exist
+    #[arg(long, short)]
+    pub force: bool,
 }
 
 impl Runnable for NewCommand {
     fn run(&self) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
 
-        let post_path = post::create_post(&cwd, &self.lang, self.path.as_str())?;
+        let post_path = post::create_post(&cwd, &self.lang, self.path.as_str(), self.force)?;
 
         println!(
             "[{}] Created new post at {}",
