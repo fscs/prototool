@@ -15,7 +15,7 @@ askama = "0.12.1"
 tempfile = "3.10.1"
 owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 chrono = { version = "0.4.35", features = ["serde"] }
-reqwest = { version = "0.12.2", features = ["blocking", "json"] }
+reqwest = { version = "0.12.2", features = ["blocking", "json", "rustls-tls", "http2", "macos-system-configuration", "charset"], default-features = false }
 url = "2.5.0"
 uuid = { version = "1.8.0", features = ["v4", "serde"] }
 
