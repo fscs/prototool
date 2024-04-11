@@ -19,24 +19,24 @@ jobs:
         platform:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            bin: sitzungsverwaltung-linux-amd64
+            bin: prototool-linux-amd64
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            bin: sitzungsverwaltung-linux-amd64
+            bin: prototool-linux-amd64
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            bin: sitzungsverwaltung-amd64.exe
+            bin: prototool-amd64.exe
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-            bin: sitzungsverwaltung-aarch64.exe
+            bin: prototool-aarch64.exe
 
           - os: macos-latest
             target: x86_64-apple-darwin
-            bin: sitzungsverwaltung-darwin-amd64
+            bin: prototool-darwin-amd64
           - os: macos-latest
             target: aarch64-apple-darwin
-            bin: sitzungsverwaltung-darwin-aarch64
+            bin: prototool-darwin-aarch64
         toolchain:
           - stable
     steps:
@@ -50,11 +50,11 @@ jobs:
           args: "--locked --release"
           strip: true
       - name: Rename binary (linux and macos)
-        run: mv target/${{ matrix.platform.target }}/release/sitzungsverwaltung target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        run: mv target/${{ matrix.platform.target }}/release/prototool target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os != 'windows-latest'
           
       - name: Rename binary (windows)
-        run: mv target/${{ matrix.platform.target }}/release/sitzungsverwaltung.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        run: mv target/${{ matrix.platform.target }}/release/prototool.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os == 'windows-latest'
           
       - name: Release 
