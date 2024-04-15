@@ -4,7 +4,7 @@ date: "{{ datetime.format("%Y-%m-%dT%H:%M:%S") }}"
 ---
 
 <details>
-<summary>Anwesenheitsliste<summary>
+<summary>Anwesenheitsliste</summary>
 
 #### Anwesende Räte
 {%~ for rat in raete -%}
