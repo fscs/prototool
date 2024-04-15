@@ -1,13 +1,13 @@
 ---
-title: "Protokoll vom {{date}}"
-date: "{{date_machine}}"
+title: "Protokoll vom {{datetime.format("%d.%m.%Y")}}"
+date: "{{ datetime.format("%Y-%m-%dT%H:%M:%S") }}"
 ---
 
 <details>
 <summary>Anwesenheitsliste<summary>
 
 #### Anwesende Räte
-{%~ for rat in räte -%}
+{%~ for rat in raete -%}
 {%- if !rat.abgemeldet -%}
 - {{ rat.name }}
 {% endif -%}
@@ -16,7 +16,7 @@ date: "{{date_machine}}"
 #### Abwesende Räte
 
 #### Entschuldigte Räte
-{%~ for rat in räte -%}
+{%~ for rat in raete -%}
 {%- if rat.abgemeldet -%}
 - {{ rat.name }}
 {% endif -%}

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -27,7 +27,7 @@ pub struct Abmeldung {
 pub fn fetch_persons(
     api_url: &Url,
     client: &Client,
-    datetime: &NaiveDateTime,
+    datetime: &DateTime<Utc>,
 ) -> Result<Vec<Person>> {
     let endpoint = api_url.join("api/person/by-role/")?;
 
@@ -77,6 +77,7 @@ pub fn determine_present_räte(personen: &[Person], abmeldungen: &[Abmeldung]) -
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::{Abmeldung, Person, Rat};
     use pretty_assertions::assert_eq;

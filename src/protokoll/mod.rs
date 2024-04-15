@@ -1,80 +1,50 @@
-use anyhow::{Context, Result};
 use askama::Template;
-use chrono::NaiveDateTime;
-
-use std::{fs, path::Path};
+use chrono::{DateTime, Utc};
 
 use events::Event;
 use raete::Rat;
-use tops::{Antrag, Top};
+use tops::Top;
 
 pub mod events;
 pub mod raete;
 pub mod tops;
 
-pub fn write_protokoll_template(
-    path: &Path,
-    tops: Vec<Top>,
-    räte: Vec<Rat>,
-    events: Vec<Event>,
-    datetime: &NaiveDateTime,
-) -> Result<()> {
-    let date_machine = datetime.format("%Y-%m-%dT%H:%M:%S");
-    let date_human = datetime.format("%d.%m.%Y");
-
-    let template = ProtokollTemplate {
-        date_machine: date_machine.to_string(),
-        date: date_human.to_string(),
-        events,
-        tops,
-        räte,
-    };
-
-    let result = template
-        .render()
-        .context("failed to render protokoll template")?;
-
-    fs::write(path, result).context("failed to write protokoll template")?;
-
-    Ok(())
-}
-
 #[derive(Debug, Template)]
 #[template(path = "../templates/protokoll.md")]
-struct ProtokollTemplate {
+pub struct ProtokollTemplate {
     pub tops: Vec<Top>,
-    pub räte: Vec<Rat>,
+    pub raete: Vec<Rat>,
     pub events: Vec<Event>,
-    pub date: String,
-    pub date_machine: String,
+    pub datetime: DateTime<Utc>,
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use crate::protokoll::{events::Event, raete::Rat};
+    use super::{
+        events::Event,
+        raete::Rat,
+        tops::{Antrag, Top},
+    };
 
-    use super::{Antrag, ProtokollTemplate, Top};
+    use super::ProtokollTemplate;
     use askama::Template;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
+    use chrono::{TimeZone, Utc};
     use pretty_assertions::assert_eq;
 
-    use std::fs;
-
-    static PROTOKOLL_NO_TOPS: &'static str = include_str!("../../tests/protokoll-no-tops.md");
-    static PROTOKOLL_WITH_TOPS: &'static str = include_str!("../../tests/protokoll-with-tops.md");
-    static PROTOKOLL_WITH_RÄTE: &'static str = include_str!("../../tests/protokoll-with-rate.md");
-    static PROTOKOLL_WITH_EVENTS: &'static str =
+    static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
+    static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
+    static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
+    static PROTOKOLL_WITH_EVENTS: &str =
         include_str!("../../tests/protokoll-with-events.md");
 
     #[test]
     fn render_without_tops() {
         let template = ProtokollTemplate {
-            date: "27.05.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15".to_string(),
+            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            raete: vec![],
             events: vec![],
             tops: vec![],
-            räte: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_NO_TOPS);
@@ -83,10 +53,9 @@ mod tests {
     #[test]
     fn render_with_tops() {
         let template = ProtokollTemplate {
-            date: "27.05.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15".to_string(),
+            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
             events: vec![],
-            räte: vec![],
+            raete: vec![],
             tops: vec![
                 Top {
                     name: "Blumen für Valentin".to_string(),
@@ -122,9 +91,8 @@ mod tests {
     #[test]
     fn render_with_räte() {
         let template = ProtokollTemplate {
-            date: "27.05.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15".to_string(),
-            räte: vec![
+            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            raete: vec![
                 Rat {
                     name: "Valentin".to_string(),
                     abgemeldet: false,
@@ -156,64 +124,23 @@ mod tests {
     #[test]
     fn render_with_events() {
         let template = ProtokollTemplate {
-            date: "27.05.2022".to_string(),
-            date_machine: "2022-05-27T07:30:15".to_string(),
-            räte: vec![],
+            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            raete: vec![],
             events: vec![
                 Event {
                     title: "Spieleabend".to_string(),
                     location: "33er".to_string(),
-                    start: Utc.with_ymd_and_hms(2042, 04, 05, 17, 00, 00).unwrap(),
+                    start: Utc.with_ymd_and_hms(2042, 4, 5, 17, 00, 00).unwrap(),
                 },
                 Event {
                     title: "Semestergrillen".to_string(),
                     location: "Grillplätze bei der Mathe".to_string(),
-                    start: Utc.with_ymd_and_hms(2042, 04, 12, 17, 00, 00).unwrap(),
+                    start: Utc.with_ymd_and_hms(2042, 4, 12, 17, 00, 00).unwrap(),
                 },
             ],
             tops: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_EVENTS);
-    }
-
-    #[test]
-    fn write_protokoll_template() {
-        let tmpfile = tempfile::NamedTempFile::new().unwrap();
-        let time = NaiveTime::from_hms_opt(7, 30, 15).unwrap();
-        let date = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
-        let datetime = NaiveDateTime::new(date, time);
-
-        let tops = vec![
-            Top {
-                name: "Blumen für Valentin".to_string(),
-                weight: 1,
-                anträge: vec![Antrag {
-                    titel: "Blumen für Valentin".to_string(),
-                    antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                    begründung: "Weil wir Valentin toll finden".to_string(),
-                }],
-            },
-            Top {
-                name: "Volt Zapfanlage".to_string(),
-                weight: 2,
-                anträge: vec![
-                    Antrag {
-                        titel: "Tank für Voltzapfanlage".to_string(),
-                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                        begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                    },
-                    Antrag {
-                        titel: "Hahn für Voltzapfanlage".to_string(),
-                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                        begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                    },
-                ],
-            },
-        ];
-
-        super::write_protokoll_template(tmpfile.path(), tops, vec![], vec![], &datetime).unwrap();
-
-        assert_eq!(fs::read_to_string(tmpfile).unwrap(), PROTOKOLL_WITH_TOPS);
     }
 }
