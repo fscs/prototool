@@ -2,7 +2,6 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use askama::Template;
-use owo_colors::OwoColorize;
 
 use chrono::{DateTime, Utc};
 use clap::Args;
@@ -37,16 +36,16 @@ impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let client = Client::new();
 
-        println!("[{}] Fetching tops...", "prototool".green(),);
+        println!("Fetching tops...");
         let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
         let now = chrono::Local::now().to_utc();
 
-        println!("[{}] Fetching räte and withdrawals...", "prototool".green(),);
+        println!("Fetching räte and withdrawals...");
         let persons = raete::fetch_persons(&self.endpoint_url, &client, &now)?;
         let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client)?;
         let raete = raete::determine_present_räte(&persons, &abmeldungen);
 
-        println!("[{}] Fetching events...", "prototool".green(),);
+        println!("Fetching events...");
         let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
 
         let template = ProtokollTemplate {
@@ -76,8 +75,7 @@ impl GenerateCommand {
         fs::write(&file_path, rendered)?;
 
         println!(
-            "[{}] Created Protokoll at '{}'",
-            "prototool".green(),
+            "Created Protokoll at '{}'",
             file_path.to_string_lossy()
         );
 

@@ -21,10 +21,10 @@ fn main() -> ExitCode {
     match run(args.command) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("{} {}", "[prototool]".red(), e,);
+            eprintln!("{}\n {}", "error:".red(), e,);
 
             if e.chain().len() > 1 {
-                eprintln!("            {}", e.root_cause());
+                eprintln!(" {}", e.root_cause());
             }
 
             ExitCode::FAILURE
