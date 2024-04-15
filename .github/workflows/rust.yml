@@ -11,7 +11,7 @@ jobs:
       - name: test
         run: cargo test --verbose
   build:
-    name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
+    name: ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.os }}
     strategy:
       fail-fast: false
