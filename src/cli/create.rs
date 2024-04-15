@@ -34,9 +34,9 @@ impl Runnable for NewCommand {
             post_path.to_string_lossy()
         );
 
-        let now = chrono::Local::now();
+        let now = chrono::Local::now().naive_local();
 
-        post::write_post_template(&post_path, &now.into())?;
+        post::write_post_template(&post_path, &now)?;
 
         if let Some(maybe_editor) = &self.edit {
             let editor = match maybe_editor {

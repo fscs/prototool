@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use askama::Template;
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -55,7 +55,7 @@ pub fn edit(path: &Path, editor: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn write_post_template(path: &Path, date: &DateTime<Utc>) -> Result<()> {
+pub fn write_post_template(path: &Path, date: &NaiveDateTime) -> Result<()> {
     let date_formatted = date.format("%Y-%m-%dT%H:%M:%S");
 
     let template = PostTemplate {
@@ -75,7 +75,7 @@ pub fn write_post_template(path: &Path, date: &DateTime<Utc>) -> Result<()> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use askama::Template;
-    use chrono::{TimeZone, Utc};
+    use chrono::NaiveDate;
     use pretty_assertions::assert_eq;
     use tempfile::tempdir;
 
@@ -119,7 +119,11 @@ mod tests {
     #[test]
     fn write_post_template() {
         let tmpfile = tempfile::NamedTempFile::new().unwrap();
-        let datetime = Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap();
+        let datetime = 
+            NaiveDate::from_ymd_opt(2022, 5, 27)
+                .unwrap()
+                .and_hms_opt(7, 30, 15)
+                .unwrap();
 
         super::write_post_template(tmpfile.path(), &datetime).unwrap();
 

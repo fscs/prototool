@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -27,7 +27,7 @@ pub struct Abmeldung {
 pub fn fetch_persons(
     api_url: &Url,
     client: &Client,
-    datetime: &DateTime<Utc>,
+    datetime: &NaiveDateTime,
 ) -> Result<Vec<Person>> {
     let endpoint = api_url.join("api/person/by-role/")?;
 

@@ -3,7 +3,7 @@ use std::fs;
 use anyhow::{Context, Result};
 use askama::Template;
 
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 use clap::Args;
 use reqwest::blocking::Client;
 use url::Url;
@@ -38,7 +38,7 @@ impl Runnable for GenerateCommand {
 
         println!("Fetching tops...");
         let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
-        let now = chrono::Local::now().to_utc();
+        let now = chrono::Local::now().naive_local();
 
         println!("Fetching räte and withdrawals...");
         let persons = raete::fetch_persons(&self.endpoint_url, &client, &now)?;
@@ -62,7 +62,7 @@ impl Runnable for GenerateCommand {
 }
 
 impl GenerateCommand {
-    fn create_locally(&self, timestamp: &DateTime<Utc>, template: ProtokollTemplate) -> Result<()> {
+    fn create_locally(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
         let path = format!("protokolle/{}.md", timestamp.format("%Y-%m-%d"));
 

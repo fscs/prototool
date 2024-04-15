@@ -1,5 +1,5 @@
 use askama::Template;
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 
 use events::Event;
 use raete::Rat;
@@ -15,7 +15,7 @@ pub struct ProtokollTemplate {
     pub tops: Vec<Top>,
     pub raete: Vec<Rat>,
     pub events: Vec<Event>,
-    pub datetime: DateTime<Utc>,
+    pub datetime: NaiveDateTime,
 }
 
 #[cfg(test)]
@@ -29,7 +29,7 @@ mod tests {
 
     use super::ProtokollTemplate;
     use askama::Template;
-    use chrono::{TimeZone, Utc};
+    use chrono::{NaiveDate, TimeZone, Utc};
     use pretty_assertions::assert_eq;
 
     static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
@@ -40,7 +40,10 @@ mod tests {
     #[test]
     fn render_without_tops() {
         let template = ProtokollTemplate {
-            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                .unwrap()
+                .and_hms_opt(7, 30, 15)
+                .unwrap(),
             raete: vec![],
             events: vec![],
             tops: vec![],
@@ -52,7 +55,10 @@ mod tests {
     #[test]
     fn render_with_tops() {
         let template = ProtokollTemplate {
-            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                .unwrap()
+                .and_hms_opt(7, 30, 15)
+                .unwrap(),
             events: vec![],
             raete: vec![],
             tops: vec![
@@ -90,7 +96,10 @@ mod tests {
     #[test]
     fn render_with_räte() {
         let template = ProtokollTemplate {
-            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                .unwrap()
+                .and_hms_opt(7, 30, 15)
+                .unwrap(),
             raete: vec![
                 Rat {
                     name: "Valentin".to_string(),
@@ -123,7 +132,10 @@ mod tests {
     #[test]
     fn render_with_events() {
         let template = ProtokollTemplate {
-            datetime: Utc.with_ymd_and_hms(2022, 5, 27, 7, 30, 15).unwrap(),
+            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                .unwrap()
+                .and_hms_opt(7, 30, 15)
+                .unwrap(),
             raete: vec![],
             events: vec![
                 Event {
