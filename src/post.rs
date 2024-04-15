@@ -119,11 +119,10 @@ mod tests {
     #[test]
     fn write_post_template() {
         let tmpfile = tempfile::NamedTempFile::new().unwrap();
-        let datetime = 
-            NaiveDate::from_ymd_opt(2022, 5, 27)
-                .unwrap()
-                .and_hms_opt(7, 30, 15)
-                .unwrap();
+        let datetime = NaiveDate::from_ymd_opt(2022, 5, 27)
+            .unwrap()
+            .and_hms_opt(7, 30, 15)
+            .unwrap();
 
         super::write_post_template(tmpfile.path(), &datetime).unwrap();
 

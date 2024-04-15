@@ -13,6 +13,7 @@ use crate::protokoll::ProtokollTemplate;
 
 use crate::post;
 use crate::protokoll::{events, raete, tops};
+use crate::sitzung;
 
 /// Generate a new Protokoll
 #[derive(Debug, Args)]
@@ -36,12 +37,14 @@ impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let client = Client::new();
 
+        let next_sitzung = sitzung::fetch_next_sitzung(&self.endpoint_url, &client)?;
+        let timestamp = next_sitzung.date;
+
         println!("Fetching tops...");
         let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
-        let now = chrono::Local::now().naive_local();
 
         println!("Fetching räte and withdrawals...");
-        let persons = raete::fetch_persons(&self.endpoint_url, &client, &now)?;
+        let persons = raete::fetch_persons(&self.endpoint_url, &client, &timestamp)?;
         let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client)?;
         let raete = raete::determine_present_räte(&persons, &abmeldungen);
 
@@ -49,13 +52,13 @@ impl Runnable for GenerateCommand {
         let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
 
         let template = ProtokollTemplate {
-            datetime: now,
+            datetime: timestamp,
             tops,
             raete,
             events,
         };
 
-        self.create_locally(&now, template)?;
+        self.create_locally(&timestamp, template)?;
 
         Ok(())
     }
@@ -74,10 +77,7 @@ impl GenerateCommand {
 
         fs::write(&file_path, rendered)?;
 
-        println!(
-            "Created Protokoll at '{}'",
-            file_path.to_string_lossy()
-        );
+        println!("Created Protokoll at '{}'", file_path.to_string_lossy());
 
         if let Some(maybe_editor) = &self.edit {
             let editor = match maybe_editor {

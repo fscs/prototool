@@ -7,6 +7,7 @@
 mod cli;
 mod post;
 mod protokoll;
+mod sitzung;
 
 use anyhow::Result;
 use owo_colors::OwoColorize;
