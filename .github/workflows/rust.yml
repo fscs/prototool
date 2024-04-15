@@ -13,8 +13,9 @@ jobs:
   build:
     name: ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.os }}
+    needs: test
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         platform:
           - os: ubuntu-latest
