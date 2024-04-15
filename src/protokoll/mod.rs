@@ -35,8 +35,7 @@ mod tests {
     static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
     static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
-    static PROTOKOLL_WITH_EVENTS: &str =
-        include_str!("../../tests/protokoll-with-events.md");
+    static PROTOKOLL_WITH_EVENTS: &str = include_str!("../../tests/protokoll-with-events.md");
 
     #[test]
     fn render_without_tops() {

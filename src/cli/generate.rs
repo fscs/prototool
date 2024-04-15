@@ -20,7 +20,7 @@ use crate::protokoll::{events, raete, tops};
 pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
     #[arg(short = 'U', default_value = "https://fscs.hhu.de/")]
-    pub endpoint_url: String,
+    pub endpoint_url: Url,
     /// Under which language the protokoll should be created
     #[arg(short, long, default_value = "de")]
     pub lang: String,
@@ -35,20 +35,19 @@ pub struct GenerateCommand {
 
 impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
-        let base_url = Url::parse(&self.endpoint_url).context("unable to parse endpoint url")?;
         let client = Client::new();
 
         println!("[{}] Fetching tops...", "prototool".green(),);
-        let tops = tops::fetch_current_tops(&base_url, &client)?;
+        let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
         let now = chrono::Local::now().to_utc();
 
         println!("[{}] Fetching räte and withdrawals...", "prototool".green(),);
-        let persons = raete::fetch_persons(&base_url, &client, &now)?;
-        let abmeldungen = raete::fetch_abmeldungen(&base_url, &client)?;
+        let persons = raete::fetch_persons(&self.endpoint_url, &client, &now)?;
+        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client)?;
         let raete = raete::determine_present_räte(&persons, &abmeldungen);
 
         println!("[{}] Fetching events...", "prototool".green(),);
-        let events = events::fetch_calendar_events(&base_url, &client)?;
+        let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
 
         let template = ProtokollTemplate {
             datetime: now,
