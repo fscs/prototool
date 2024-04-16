@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -9,7 +9,7 @@ pub struct Event {
     #[serde(rename = "summary")]
     pub title: String,
     pub location: String,
-    pub start: DateTime<Utc>,
+    pub start: DateTime<Local>,
 }
 
 pub fn fetch_calendar_events(api_url: &Url, client: &Client) -> Result<Vec<Event>> {

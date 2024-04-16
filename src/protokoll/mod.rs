@@ -141,12 +141,12 @@ mod tests {
                 Event {
                     title: "Spieleabend".to_string(),
                     location: "33er".to_string(),
-                    start: Utc.with_ymd_and_hms(2042, 4, 5, 17, 00, 00).unwrap(),
+                    start: Utc.with_ymd_and_hms(2042, 4, 5, 17, 00, 00).unwrap().into(),
                 },
                 Event {
                     title: "Semestergrillen".to_string(),
                     location: "Grillplätze bei der Mathe".to_string(),
-                    start: Utc.with_ymd_and_hms(2042, 4, 12, 17, 00, 00).unwrap(),
+                    start: Utc.with_ymd_and_hms(2042, 4, 12, 17, 00, 00).unwrap().into(),
                 },
             ],
             tops: vec![],
