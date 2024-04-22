@@ -7,15 +7,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.5.3", features = ["derive", "env"] }
 anyhow = "1.0.81"
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.114"
 askama = "0.12.1"
-tempfile = "3.10.1"
-owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 chrono = { version = "0.4.35", features = ["serde"] }
+clap = { version = "4.5.3", features = ["derive", "env"] }
+opener = "0.7.0"
+owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 reqwest = { version = "0.12.2", features = ["blocking", "json", "rustls-tls", "http2", "macos-system-configuration", "charset"], default-features = false }
+serde_json = "1.0.114"
+serde = { version = "1.0.197", features = ["derive"] }
+tempfile = "3.10.1"
 url = "2.5.0"
 uuid = { version = "1.8.0", features = ["v4", "serde"] }
 
