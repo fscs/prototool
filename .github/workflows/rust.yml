@@ -13,7 +13,7 @@ jobs:
   build:
     name: ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.os }}
-    needs: [test, changelog]
+    needs: test
     strategy:
       fail-fast: true
       matrix:
