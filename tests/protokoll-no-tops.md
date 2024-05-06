@@ -16,7 +16,7 @@ date: "2022-05-27T07:30:15"
 
 </details>
 
-## Top 0 : Regularia
+## Top 0: Regularia
 
 Protokollant: 
 Redeleitung: 
