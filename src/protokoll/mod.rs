@@ -146,7 +146,10 @@ mod tests {
                 Event {
                     title: "Semestergrillen".to_string(),
                     location: "Grillplätze bei der Mathe".to_string(),
-                    start: Utc.with_ymd_and_hms(2042, 4, 12, 17, 00, 00).unwrap().into(),
+                    start: Utc
+                        .with_ymd_and_hms(2042, 4, 12, 17, 00, 00)
+                        .unwrap()
+                        .into(),
                 },
             ],
             tops: vec![],
