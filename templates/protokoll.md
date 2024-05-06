@@ -26,7 +26,7 @@ date: "{{ datetime.format("%Y-%m-%dT%H:%M:%S") }}"
 
 </details>
 
-## Top 0 : Regularia
+## Top 0: Regularia
 
 Protokollant: 
 Redeleitung: 
