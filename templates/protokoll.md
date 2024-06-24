@@ -58,10 +58,10 @@ _Top endet um T Uhr._
   
 {{ antrag.begründung }}
 
-:::info
+```ad-success
 {{antrag.antragstext}}
-**Abstimmung:** n Zustimmen, n Gegenstimmen, n Enthaltungen
-:::
+Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
+```
 {% endfor ~%}
 
 _Top endet um T Uhr._
