@@ -67,7 +67,11 @@ impl Runnable for GenerateCommand {
 impl GenerateCommand {
     fn create_locally(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
-        let path = format!("protokolle/{}.md", timestamp.format("%Y-%m-%d"));
+        let path = format!(
+            "protokolle/{}/{}-protokoll.md",
+            timestamp.format("%Y"),
+            timestamp.format("%m-%d"),
+        );
 
         let file_path = post::create_post(&cwd, &self.lang, &path, self.force)?;
 
