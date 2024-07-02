@@ -1,6 +1,6 @@
 ---
 title: "Protokoll vom 27.05.2022"
-date: "2022-05-27T07:30:15"
+date: "2022-05-27"
 ---
 
 <details>

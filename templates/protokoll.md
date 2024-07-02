@@ -1,6 +1,6 @@
 ---
 title: "Protokoll vom {{datetime.format("%d.%m.%Y")}}"
-date: "{{ datetime.format("%Y-%m-%dT%H:%M:%S") }}"
+date: "{{ datetime.format("%Y-%m-%d") }}"
 ---
 
 <details>
