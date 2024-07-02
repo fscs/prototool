@@ -32,7 +32,7 @@ Protokollant:
 Redeleitung: 
 Startzeit: 
 Endzeit: 
-Wir sind mit n von nmax Räten beschlussfähig
+Wir sind mit n von {{ raete.len() }} Räten beschlussfähig
 Wir nehmen die unten aufgelistete Topliste einstimmig an
 Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 
