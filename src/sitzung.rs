@@ -18,8 +18,6 @@ pub fn fetch_next_sitzung(api_url: &Url, client: &Client) -> Result<Sitzung> {
         .send()
         .context("unable to fetch next sitzung")?;
 
-    println!("{:?}", response);
-
     let sitzung = response.json().context("failed to deserialize sitzung")?;
 
     Ok(sitzung)
