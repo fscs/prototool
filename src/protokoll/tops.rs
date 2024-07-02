@@ -10,11 +10,20 @@ pub struct Antrag {
     pub begründung: String,
 }
 
+#[derive(Debug, Deserialize, PartialEq)]
+pub enum TopType {
+    #[serde(rename = "normal")]
+    Normal,
+    #[serde(rename = "sonstiges")]
+    Sonstige,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Top {
     pub weight: i64,
     pub name: String,
     pub anträge: Vec<Antrag>,
+    pub top_type: TopType,
 }
 
 pub fn fetch_current_tops(api_url: &Url, client: &Client) -> Result<Vec<Top>> {

@@ -74,4 +74,7 @@ _Top endet um T Uhr._
 
 ### Sonstiges
 
+#### Voltpfand
+Der Voltpfand muss dringend weggebracht werden.
+
 _Top endet um T Uhr._

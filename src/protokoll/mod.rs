@@ -18,13 +18,35 @@ pub struct ProtokollTemplate {
     pub datetime: NaiveDateTime,
 }
 
+mod filters {
+    use super::tops::{Top, TopType};
+
+    pub fn normal_tops<'a>(tops: &'a [Top]) -> ::askama::Result<Vec<&'a Top>> {
+        let result = tops
+            .iter()
+            .filter(|e| e.top_type == TopType::Normal)
+            .collect();
+
+        return Ok(result);
+    }
+
+    pub fn sonstige_tops<'a>(tops: &'a [Top]) -> ::askama::Result<Vec<&'a Top>> {
+        let result = tops
+            .iter()
+            .filter(|e| e.top_type == TopType::Sonstige)
+            .collect();
+
+        return Ok(result);
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::{
         events::Event,
         raete::Rat,
-        tops::{Antrag, Top},
+        tops::{Antrag, Top, TopType},
     };
 
     use super::ProtokollTemplate;
@@ -65,6 +87,7 @@ mod tests {
                 Top {
                     name: "Blumen für Valentin".to_string(),
                     weight: 1,
+                    top_type: TopType::Normal,
                     anträge: vec![Antrag {
                         titel: "Blumen für Valentin".to_string(),
                         antragstext: "Die Fachschaft Informatik beschließt".to_string(),
@@ -72,8 +95,19 @@ mod tests {
                     }],
                 },
                 Top {
+                    name: "Voltpfand".to_string(),
+                    weight: 1,
+                    top_type: TopType::Sonstige,
+                    anträge: vec![Antrag {
+                        titel: "Voltpfand".to_string(),
+                        antragstext: "aint nobody got time for that".to_string(),
+                        begründung: "Der Voltpfand muss dringend weggebracht werden.".to_string(),
+                    }],
+                },
+                Top {
                     name: "Volt Zapfanlage".to_string(),
                     weight: 2,
+                    top_type: TopType::Normal,
                     anträge: vec![
                         Antrag {
                             titel: "Tank für Voltzapfanlage".to_string(),
