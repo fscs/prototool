@@ -58,7 +58,7 @@ _Top endet um T Uhr._
   
 {{ antrag.begründung }}
 
-```ad-success
+```vote-success
 {{antrag.antragstext}}
 Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
 ```
