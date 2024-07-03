@@ -6,14 +6,14 @@ date: "2022-05-27"
 <details>
 <summary>Anwesenheitsliste</summary>
 
-#### Anwesende Räte
+#### Anwesende Rätys
 - Valentin
 - Jonas "Kooptimus"
 - Marcel "Markal"
 
-#### Abwesende Räte
+#### Abwesende Rätys
 
-#### Entschuldigte Räte
+#### Entschuldigte Rätys
 - Elif
 - Australian
 
@@ -23,11 +23,11 @@ date: "2022-05-27"
 
 ## Top 0: Regularia
 
-- Protokollant: 
 - Redeleitung: 
+- Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 5 Räten beschlussfähig
+- Wir sind mit n von 5 Rätys beschlussfähig
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 

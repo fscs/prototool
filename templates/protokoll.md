@@ -6,16 +6,16 @@ date: "{{ datetime.format("%Y-%m-%d") }}"
 <details>
 <summary>Anwesenheitsliste</summary>
 
-#### Anwesende Räte
+#### Anwesende Rätys
 {%~ for rat in raete -%}
 {%- if !rat.abgemeldet -%}
 - {{ rat.name }}
 {% endif -%}
 {%- endfor ~%}
 
-#### Abwesende Räte
+#### Abwesende Rätys
 
-#### Entschuldigte Räte
+#### Entschuldigte Rätys
 {%~ for rat in raete -%}
 {%- if rat.abgemeldet -%}
 - {{ rat.name }}
@@ -28,11 +28,11 @@ date: "{{ datetime.format("%Y-%m-%d") }}"
 
 ## Top 0: Regularia
 
-- Protokollant: 
 - Redeleitung: 
+- Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von {{ raete.len() }} Räten beschlussfähig
+- Wir sind mit n von {{ raete.len() }} Rätys beschlussfähig
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 

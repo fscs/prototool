@@ -6,11 +6,11 @@ date: "2022-05-27"
 <details>
 <summary>Anwesenheitsliste</summary>
 
-#### Anwesende Räte
+#### Anwesende Rätys
 
-#### Abwesende Räte
+#### Abwesende Rätys
 
-#### Entschuldigte Räte
+#### Entschuldigte Rätys
 
 #### Gäste
 
@@ -18,11 +18,11 @@ date: "2022-05-27"
 
 ## Top 0: Regularia
 
-- Protokollant: 
 - Redeleitung: 
+- Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 0 Räten beschlussfähig
+- Wir sind mit n von 0 Rätys beschlussfähig
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 
