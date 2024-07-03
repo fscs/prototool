@@ -59,8 +59,11 @@ jobs:
         if: matrix.platform.os == 'windows-latest'
 
       - name: Release
-        uses: mgoltzsche/conventional-release@v0 
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          auto-release: false
-          github-release-files: |
+          generate_release_notes: true
+          files: |
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
