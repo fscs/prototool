@@ -64,13 +64,3 @@ jobs:
           auto-release: false
           github-release-files: |
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          generate_release_notes: true
-          files: |
-            target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
