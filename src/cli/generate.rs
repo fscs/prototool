@@ -20,11 +20,11 @@ use reqwest::blocking::Client;
 use url::Url;
 
 use super::Runnable;
-use crate::protokoll::ProtokollTemplate;
+use prototool::protokoll::ProtokollTemplate;
 
-use crate::post;
-use crate::protokoll::{events, raete, tops};
-use crate::sitzung;
+use prototool::post;
+use prototool::protokoll::{events, raete, tops};
+use prototool::sitzung;
 
 /// Generate a new Protokoll
 #[derive(Debug, Args)]
@@ -40,9 +40,8 @@ pub struct GenerateCommand {
     #[arg(short, long, default_value = "de")]
     pub lang: String,
     /// Open the protokoll for editing.  
-    /// Optionally takes the editor to use, falls back to $EDITOR otherwise
     #[arg(long, short)]
-    pub edit: Option<Option<String>>,
+    pub edit: bool,
     /// Force creation, even if a file already exist
     #[arg(long, short)]
     pub force: bool,
@@ -111,14 +110,8 @@ impl GenerateCommand {
 
         println!("Created Protokoll at '{}'", file_path.to_string_lossy());
 
-        if let Some(maybe_editor) = &self.edit {
-            let editor = match maybe_editor {
-                Some(x) => x.to_owned(),
-                None => std::env::var("EDITOR")
-                    .context("unable to determine editor. wasnt specified and $EDITOR isnt set")?,
-            };
-
-            post::edit(&file_path, &editor)?
+        if self.edit {
+            post::edit(&file_path)?
         }
 
         Ok(())

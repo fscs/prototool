@@ -43,16 +43,8 @@ pub fn create_post(root: &Path, lang: &str, target: &str, force: bool) -> Result
     Ok(target_path)
 }
 
-pub fn edit(path: &Path, editor: &str) -> Result<()> {
-    // Spawn editor process
-    let mut cmd = std::process::Command::new(editor)
-        .arg(path)
-        .spawn()
-        .context("editor {editor} not found")?;
-
-    cmd.wait()?;
-
-    Ok(())
+pub fn edit(path: &Path) -> Result<()> {
+    opener::open(path).context("unable to open file")
 }
 
 pub fn write_post_template(path: &Path, date: &NaiveDateTime) -> Result<()> {

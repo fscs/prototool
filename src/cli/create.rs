@@ -3,7 +3,7 @@ use clap::Args;
 use owo_colors::OwoColorize;
 
 use super::Runnable;
-use crate::post;
+use prototool::post;
 
 /// Create a new post.
 #[derive(Debug, Args)]
@@ -14,9 +14,8 @@ pub struct NewCommand {
     #[arg(short, long, default_value = "de")]
     pub lang: String,
     /// Open the post for editing.  
-    /// Optionally takes the editor to use, falls back to $EDITOR otherwise
     #[arg(long, short)]
-    pub edit: Option<Option<String>>,
+    pub edit: bool,
     /// Force creation, even if a file already exist
     #[arg(long, short)]
     pub force: bool,
@@ -38,14 +37,8 @@ impl Runnable for NewCommand {
 
         post::write_post_template(&post_path, &now)?;
 
-        if let Some(maybe_editor) = &self.edit {
-            let editor = match maybe_editor {
-                Some(x) => x.to_owned(),
-                None => std::env::var("EDITOR")
-                    .context("unable to determine editor. wasnt specified and $EDITOR isnt set")?,
-            };
-
-            post::edit(&post_path, &editor)?
+        if self.edit {
+            post::edit(&post_path)?;
         }
 
         Ok(())
