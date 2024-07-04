@@ -29,10 +29,10 @@ Arguments:
   <PATH>  Path of the new post. e.g. posts/test.md
 
 Options:
-  -l, --lang <LANG>    Under which language the post should be created [default: de]
-  -e, --edit [<EDIT>]  Open the post for editing. Optionally takes the editor to use, falls back to $EDITOR otherwise
-  -f, --force          Force creation, even if a file already exist
-  -h, --help           Print help
+  -l, --lang <LANG>  Under which language the post should be created [default: de]
+  -e, --edit         Open the post for editing
+  -f, --force        Force creation, even if a file already exist
+  -h, --help         Print help
 
 # prototool gen
 Generate a new Protokoll
@@ -42,6 +42,8 @@ Usage: prototool gen [OPTIONS]
 Options:
   -U <ENDPOINT_URL>      Endpoint to fetch Tops from [default: https://fscs.hhu.de/]
   -l, --lang <LANG>      Under which language the protokoll should be created [default: de]
-  -e, --edit [<EDIT>]    Open the protokoll for editing. Optionally takes the editor to use, falls back to $EDITOR otherwise
+  -e, --edit             Open the protokoll for editing
   -f, --force            Force creation, even if a file already exist
+      --to-clipboard     Generate the protokoll into the system clipboard
+      --from-clipboard   Load the protokoll content from the system clipboard
   -h, --help             Print help
