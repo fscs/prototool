@@ -58,8 +58,14 @@ impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let client = Client::new();
 
+        println!("Fetching sitzung...");
         let next_sitzung = sitzung::fetch_next_sitzung(&self.endpoint_url, &client)?;
         let timestamp = next_sitzung.date;
+        
+        if self.from_clipboard {
+            self.create_from_clipboard(&timestamp)?;
+            return Ok(());
+        }
 
         println!("Fetching tops...");
         let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
@@ -79,14 +85,9 @@ impl Runnable for GenerateCommand {
             events,
         };
 
-        // if running in to_clipboard mode, this might lead to a panic (because we're forking)
-        // so we do it now
-        drop(client);
-
         if self.to_clipboard {
+            drop(client);
             self.create_in_clipboard(template)?;
-        } else if self.from_clipboard {
-            unimplemented!();
         } else {
             self.create_locally(&timestamp, template)?;
         }
@@ -96,7 +97,7 @@ impl Runnable for GenerateCommand {
 }
 
 impl GenerateCommand {
-    fn create_locally(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
+    fn write_to_file(&self, timestamp: &NaiveDateTime, content: &str) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
         let path = format!(
             "protokolle/{}/{}-protokoll.md",
@@ -106,11 +107,7 @@ impl GenerateCommand {
 
         let file_path = post::create_post(&cwd, &self.lang, &path, self.force)?;
 
-        let rendered = template
-            .render()
-            .context("error while rendering template")?;
-
-        fs::write(&file_path, rendered)?;
+        fs::write(&file_path, content)?;
 
         println!("Created Protokoll at '{}'", file_path.to_string_lossy());
 
@@ -125,6 +122,14 @@ impl GenerateCommand {
         }
 
         Ok(())
+    }
+
+    fn create_locally(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
+        let rendered = template
+            .render()
+            .context("error while rendering template")?;
+
+        self.write_to_file(timestamp, rendered.as_str())
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -174,5 +179,13 @@ impl GenerateCommand {
         }
 
         Ok(())
+    }
+
+    fn create_from_clipboard(&self, timestamp: &NaiveDateTime) -> Result<()> {
+        let mut clipboard = Clipboard::new().context("unable to access clipboard")?;
+
+        let content = clipboard.get_text().context("unable to read clipboard")?;
+
+        self.write_to_file(timestamp, content.as_str())
     }
 }
