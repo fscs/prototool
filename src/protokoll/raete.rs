@@ -21,7 +21,7 @@ pub struct Person {
 
 #[derive(Debug, Deserialize)]
 pub struct Abmeldung {
-    person_id: Uuid,
+    pub person_id: Uuid,
 }
 
 pub fn fetch_persons(
