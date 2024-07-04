@@ -6,7 +6,7 @@ pub mod raete;
 pub mod tops;
 
 pub use events::Event;
-pub use raete::Rat;
+pub use raete::{Rat, Person, Abmeldung};
 pub use tops::{Antrag, Top, TopType};
 
 #[derive(Debug, Template)]
