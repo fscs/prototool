@@ -1,13 +1,13 @@
 use askama::Template;
 use chrono::NaiveDateTime;
 
-use events::Event;
-use raete::Rat;
-use tops::Top;
-
 pub mod events;
 pub mod raete;
 pub mod tops;
+
+pub use events::Event;
+pub use raete::Rat;
+pub use tops::{Antrag, Top, TopType};
 
 #[derive(Debug, Template)]
 #[template(path = "../templates/protokoll.md")]
