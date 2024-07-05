@@ -1,4 +1,5 @@
 # prototool
+
 Keinen Bock mehr Tops aus dem Discord zu copy pasten? Du verlierst immer den Link zur Vorlage?
 `prototool` kommt dir zur Rettung!
 
@@ -7,6 +8,7 @@ Keinen Bock mehr Tops aus dem Discord zu copy pasten? Du verlierst immer den Lin
 ## nix
 
 Ganz normal als flake installieren oder einfach
+
 ```
 nix run github:fscs/prototool
 ```
@@ -40,12 +42,14 @@ Generate a new Protokoll
 Usage: prototool gen [OPTIONS]
 
 Options:
-  -U <ENDPOINT_URL>         Endpoint to fetch Tops from [default: https://fscs.hhu.de/]
-  -l, --lang <LANG>         Under which language the protokoll should be created [default: de]
-  -e, --edit                Open the protokoll for editing
-  -f, --force               Force creation, even if a file already exist
-      --to-clipboard        Generate the protokoll into the system clipboard
-      --from-clipboard      Load the protokoll content from the system clipboard
-      --to-pad              Copies the protokolls content into the system clipboard and opens an appropriate pad url in the webbrowser
-      --from-pad <PAD_URL>  Load the protokoll content from a hedgedoc note
-  -h, --help                Print help
+  -U, --endpoint-url <ENDPOINT_URL>  Endpoint to fetch Tops from [default: https://fscs.hhu.de/]
+  -l, --lang <LANG>                  Under which language the protokoll should be created [default: de]
+  -e, --edit                         Open the protokoll for editing
+  -f, --force                        Force creation, even if a file already exist
+      --to-clipboard                 Generate the protokoll into the system clipboard
+      --from-clipboard               Load the protokoll content from the system clipboard
+      --to-pad                       Copies the protokolls content into the system clipboard and 
+                                     opens an appropriate pad url in the webbrowser
+      --from-pad <PAD_URL>           Load the protokoll content from a hedgedoc note
+  -h, --help                         Print help
+```

@@ -34,7 +34,7 @@ use prototool::sitzung;
         ))]
 pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
-    #[arg(short = 'U', default_value = "https://fscs.hhu.de/")]
+    #[arg(short = 'U', long, default_value = "https://fscs.hhu.de/")]
     pub endpoint_url: Url,
     /// Under which language the protokoll should be created
     #[arg(short, long, default_value = "de")]
