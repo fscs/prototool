@@ -1,6 +1,7 @@
 ---
 title: "Protokoll vom 27.05.2022"
 date: "2022-05-27"
+draft: true
 ---
 
 <details>

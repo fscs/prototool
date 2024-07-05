@@ -1,6 +1,7 @@
 ---
 title: "Protokoll vom {{datetime.format("%d.%m.%Y")}}"
 date: "{{ datetime.format("%Y-%m-%d") }}"
+draft: true
 ---
 
 <details>
