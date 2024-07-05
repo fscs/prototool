@@ -21,22 +21,22 @@ pub struct ProtokollTemplate {
 mod filters {
     use super::tops::{Top, TopType};
 
-    pub fn normal_tops<'a>(tops: &'a [Top]) -> ::askama::Result<Vec<&'a Top>> {
+    pub fn normal_tops(tops: &[Top]) -> ::askama::Result<Vec<&Top>> {
         let result = tops
             .iter()
             .filter(|e| e.top_type == TopType::Normal)
             .collect();
 
-        return Ok(result);
+        Ok(result)
     }
 
-    pub fn sonstige_tops<'a>(tops: &'a [Top]) -> ::askama::Result<Vec<&'a Top>> {
+    pub fn sonstige_tops(tops: &[Top]) -> ::askama::Result<Vec<&Top>> {
         let result = tops
             .iter()
             .filter(|e| e.top_type == TopType::Sonstige)
             .collect();
 
-        return Ok(result);
+        Ok(result)
     }
 }
 

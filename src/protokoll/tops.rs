@@ -10,7 +10,7 @@ pub struct Antrag {
     pub begründung: String,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 pub enum TopType {
     #[serde(rename = "normal")]
     Normal,
