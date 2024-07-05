@@ -36,9 +36,6 @@ pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
     #[arg(short = 'U', default_value = "https://fscs.hhu.de/")]
     pub endpoint_url: Url,
-    /// Hedgedoc URL
-    #[arg(short = 'P', default_value = "https://pad.hhu.de")]
-    pub pad_url: Url,
     /// Under which language the protokoll should be created
     #[arg(short, long, default_value = "de")]
     pub lang: String,
@@ -54,9 +51,9 @@ pub struct GenerateCommand {
     /// Load the protokoll content from the system clipboard
     #[arg(long)]
     pub from_clipboard: bool,
-    /// Load the protokoll content from a hedgedoc note. Takes the notes id
-    #[arg(long)]
-    pub from_pad: Option<String>,
+    /// Load the protokoll content from a hedgedoc note
+    #[arg(long, value_name = "PAD_URL")]
+    pub from_pad: Option<Url>,
 }
 
 impl Runnable for GenerateCommand {
@@ -69,8 +66,8 @@ impl Runnable for GenerateCommand {
 
         if self.from_clipboard {
             return self.create_from_clipboard(&timestamp);
-        } else if let Some(pad_id) = &self.from_pad {
-            return self.create_from_pad(&client, pad_id.as_str(), &timestamp);
+        } else if let Some(pad_url) = &self.from_pad {
+            return self.create_from_pad(&client, pad_url, &timestamp);
         }
 
         println!("Fetching tops...");
@@ -192,14 +189,19 @@ impl GenerateCommand {
     fn create_from_pad(
         &self,
         client: &Client,
-        pad_id: &str,
+        pad_url: &Url,
         timestamp: &NaiveDateTime,
     ) -> Result<()> {
-        let endpoint = format!("{}/download", pad_id);
-        let pad_url = self.pad_url.join(&endpoint).context("invalid pad url")?;
+        // im not sure how this behaves with non http urls... 
+        let url_base = pad_url.origin().unicode_serialization();
+        let url_path = pad_url.path();
+
+        let endpoint = format!("{}{}/download", url_base, url_path);
+
+        println!("Loading pad contents from '{}'", endpoint);
 
         let response = client
-            .get(pad_url)
+            .get(endpoint)
             .send()
             .context("unable to get pad content")?;
 

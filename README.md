@@ -40,12 +40,11 @@ Generate a new Protokoll
 Usage: prototool gen [OPTIONS]
 
 Options:
-  -U <ENDPOINT_URL>          Endpoint to fetch Tops from [default: https://fscs.hhu.de/]
-  -P <PAD_URL>               Hedgedoc URL [default: https://pad.hhu.de]
-  -l, --lang <LANG>          Under which language the protokoll should be created [default: de]
-  -e, --edit                 Open the protokoll for editing
-  -f, --force                Force creation, even if a file already exist
-      --to-clipboard         Generate the protokoll into the system clipboard
-      --from-clipboard       Load the protokoll content from the system clipboard
-      --from-pad <FROM_PAD>  Load the protokoll content from a hedgedoc note. Takes the notes id
-  -h, --help                 Print help
+  -U <ENDPOINT_URL>         Endpoint to fetch Tops from [default: https://fscs.hhu.de/]
+  -l, --lang <LANG>         Under which language the protokoll should be created [default: de]
+  -e, --edit                Open the protokoll for editing
+  -f, --force               Force creation, even if a file already exist
+      --to-clipboard        Generate the protokoll into the system clipboard
+      --from-clipboard      Load the protokoll content from the system clipboard
+      --from-pad <PAD_URL>  Load the protokoll content from a hedgedoc note
+  -h, --help                Print help
