@@ -64,7 +64,7 @@ impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let client = Client::new();
 
-        println!("Fetching sitzung...");
+        println!("fetching sitzung...");
         let next_sitzung = sitzung::fetch_next_sitzung(&self.endpoint_url, &client)?;
         let timestamp = next_sitzung.date;
 
@@ -74,15 +74,15 @@ impl Runnable for GenerateCommand {
             return self.create_from_pad(&client, pad_url, &timestamp);
         }
 
-        println!("Fetching tops...");
+        println!("fetching tops...");
         let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
 
-        println!("Fetching räte and withdrawals...");
+        println!("fetching räte and withdrawals...");
         let persons = raete::fetch_persons(&self.endpoint_url, &client, &timestamp)?;
         let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client)?;
         let raete = raete::determine_present_räte(&persons, &abmeldungen);
 
-        println!("Fetching events...");
+        println!("fetching events...");
         let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
 
         let template = ProtokollTemplate {
@@ -117,7 +117,7 @@ impl GenerateCommand {
 
         fs::write(&file_path, content)?;
 
-        println!("Created Protokoll at '{}'", file_path.to_string_lossy());
+        println!("created Protokoll at '{}'", file_path.to_string_lossy());
 
         if self.edit {
             post::edit(&file_path)?
@@ -188,7 +188,7 @@ impl GenerateCommand {
             .format("https://pad.hhu.de/%Y-%m-%d-FSR-Informatik")
             .to_string();
 
-        println!("Opening '{}'", pad_url);
+        println!("opening '{}'", pad_url);
 
         opener::open_browser(pad_url).context("unable to open pad url")?;
             
@@ -215,7 +215,7 @@ impl GenerateCommand {
 
         let endpoint = format!("{}{}/download", url_base, url_path);
 
-        println!("Loading pad contents from '{}'", endpoint);
+        println!("loading pad contents from '{}'", endpoint);
 
         let response = client
             .get(endpoint)
