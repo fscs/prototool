@@ -30,12 +30,15 @@ use prototool::sitzung;
 #[derive(Debug, Args)]
 #[clap(group(
             ArgGroup::new("import_export")
-                .args(&["to_clipboard", "from_clipboard"]),
+                .args(&["to_clipboard", "from_clipboard", "from_pad"]),
         ))]
 pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
     #[arg(short = 'U', default_value = "https://fscs.hhu.de/")]
     pub endpoint_url: Url,
+    /// Hedgedoc URL
+    #[arg(short = 'P', default_value = "https://pad.hhu.de")]
+    pub pad_url: Url,
     /// Under which language the protokoll should be created
     #[arg(short, long, default_value = "de")]
     pub lang: String,
@@ -51,6 +54,9 @@ pub struct GenerateCommand {
     /// Load the protokoll content from the system clipboard
     #[arg(long)]
     pub from_clipboard: bool,
+    /// Load the protokoll content from a hedgedoc note. Takes the notes id
+    #[arg(long)]
+    pub from_pad: Option<String>,
 }
 
 impl Runnable for GenerateCommand {
@@ -60,10 +66,11 @@ impl Runnable for GenerateCommand {
         println!("Fetching sitzung...");
         let next_sitzung = sitzung::fetch_next_sitzung(&self.endpoint_url, &client)?;
         let timestamp = next_sitzung.date;
-        
+
         if self.from_clipboard {
-            self.create_from_clipboard(&timestamp)?;
-            return Ok(());
+            return self.create_from_clipboard(&timestamp);
+        } else if let Some(pad_id) = &self.from_pad {
+            return self.create_from_pad(&client, pad_id.as_str(), &timestamp);
         }
 
         println!("Fetching tops...");
@@ -178,6 +185,27 @@ impl GenerateCommand {
         let mut clipboard = Clipboard::new().context("unable to access clipboard")?;
 
         let content = clipboard.get_text().context("unable to read clipboard")?;
+
+        self.write_to_file(timestamp, content.as_str())
+    }
+
+    fn create_from_pad(
+        &self,
+        client: &Client,
+        pad_id: &str,
+        timestamp: &NaiveDateTime,
+    ) -> Result<()> {
+        let endpoint = format!("{}/download", pad_id);
+        let pad_url = self.pad_url.join(&endpoint).context("invalid pad url")?;
+
+        let response = client
+            .get(pad_url)
+            .send()
+            .context("unable to get pad content")?;
+
+        let content = response
+            .text()
+            .context("unable to determine content from response")?;
 
         self.write_to_file(timestamp, content.as_str())
     }
