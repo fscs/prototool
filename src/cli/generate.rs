@@ -30,7 +30,7 @@ use prototool::sitzung;
 #[derive(Debug, Args)]
 #[clap(group(
             ArgGroup::new("import_export")
-                .args(&["to_clipboard", "from_clipboard", "from_pad"]),
+                .args(&["to_clipboard", "from_clipboard", "to_pad", "from_pad"]),
         ))]
 pub struct GenerateCommand {
     /// Endpoint to fetch Tops from
@@ -51,6 +51,10 @@ pub struct GenerateCommand {
     /// Load the protokoll content from the system clipboard
     #[arg(long)]
     pub from_clipboard: bool,
+    /// Copies the protokolls content into the system clipboard and opens an appropriate
+    /// pad url in the webbrowser
+    #[arg(long)]
+    pub to_pad: bool,
     /// Load the protokoll content from a hedgedoc note
     #[arg(long, value_name = "PAD_URL")]
     pub from_pad: Option<Url>,
@@ -88,14 +92,15 @@ impl Runnable for GenerateCommand {
             events,
         };
 
-        if self.to_clipboard {
-            drop(client);
-            self.create_in_clipboard(template)?;
-        } else {
-            self.create_locally(&timestamp, template)?;
-        }
+        drop(client);
 
-        Ok(())
+        if self.to_clipboard {
+            self.create_in_clipboard(template)
+        } else if self.to_pad {
+            self.create_in_pad(&timestamp, template)
+        } else {
+            self.create_locally(&timestamp, template)
+        }
     }
 }
 
@@ -178,6 +183,18 @@ impl GenerateCommand {
         Ok(())
     }
 
+    fn create_in_pad(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
+        let pad_url = timestamp
+            .format("https://pad.hhu.de/%Y-%m-%d-FSR-Informatik")
+            .to_string();
+
+        println!("Opening '{}'", pad_url);
+
+        opener::open_browser(pad_url).context("unable to open pad url")?;
+            
+        self.create_in_clipboard(template)
+    }
+
     fn create_from_clipboard(&self, timestamp: &NaiveDateTime) -> Result<()> {
         let mut clipboard = Clipboard::new().context("unable to access clipboard")?;
 
@@ -192,7 +209,7 @@ impl GenerateCommand {
         pad_url: &Url,
         timestamp: &NaiveDateTime,
     ) -> Result<()> {
-        // im not sure how this behaves with non http urls... 
+        // im not sure how this behaves with non http urls...
         let url_base = pad_url.origin().unicode_serialization();
         let url_path = pad_url.path();
 
