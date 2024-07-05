@@ -6,7 +6,7 @@ pub mod raete;
 pub mod tops;
 
 pub use events::Event;
-pub use raete::{Rat, Person, Abmeldung};
+pub use raete::{Abmeldung, Person, Rat};
 pub use tops::{Antrag, Top, TopType};
 
 #[derive(Debug, Template)]
@@ -19,9 +19,11 @@ pub struct ProtokollTemplate {
 }
 
 mod filters {
+    use chrono::{Days, NaiveDate, NaiveDateTime};
+
     use super::tops::{Top, TopType};
 
-    pub fn normal_tops(tops: &[Top]) -> ::askama::Result<Vec<&Top>> {
+    pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops
             .iter()
             .filter(|e| e.top_type == TopType::Normal)
@@ -30,11 +32,20 @@ mod filters {
         Ok(result)
     }
 
-    pub fn sonstige_tops(tops: &[Top]) -> ::askama::Result<Vec<&Top>> {
+    pub fn sonstige_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops
             .iter()
             .filter(|e| e.top_type == TopType::Sonstige)
             .collect();
+
+        Ok(result)
+    }
+
+    pub fn hidden_until_date(datetime: &NaiveDateTime) -> askama::Result<NaiveDate> {
+        let date = datetime.date();
+        let result = date
+            .checked_add_days(Days::new(4))
+            .unwrap_or(date);
 
         Ok(result)
     }

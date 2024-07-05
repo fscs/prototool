@@ -2,6 +2,7 @@
 title: "Protokoll vom {{datetime.format("%d.%m.%Y")}}"
 date: "{{ datetime.format("%Y-%m-%d") }}"
 draft: true
+hiddenUntil: "{{ (datetime|hidden_until_date).format("%Y-%m-%d") }}"
 ---
 
 <details>
