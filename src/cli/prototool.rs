@@ -5,7 +5,6 @@
 #![warn(clippy::nursery)]
 
 use anyhow::Result;
-use owo_colors::OwoColorize;
 use clap::Parser;
 use clap::Subcommand;
 
@@ -39,7 +38,7 @@ fn main() -> ExitCode {
     match run(args.command) {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("{}\n {}", "error:".red(), e,);
+            eprintln!("error:\n {}", e,);
 
             if e.chain().len() > 1 {
                 eprintln!(" {}", e.root_cause());

@@ -18,7 +18,6 @@ askama = "0.12"
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "4", features = ["derive", "env"] }
 opener = "0.7"
-owo-colors = { version = "4", features = ["supports-colors"] }
 reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls", "http2", "macos-system-configuration", "charset"], default-features = false }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }

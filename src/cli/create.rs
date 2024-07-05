@@ -1,6 +1,5 @@
 use anyhow::{Context, Result};
 use clap::Args;
-use owo_colors::OwoColorize;
 
 use super::Runnable;
 use prototool::post;
@@ -27,11 +26,7 @@ impl Runnable for NewCommand {
 
         let post_path = post::create_post(&cwd, &self.lang, self.path.as_str(), self.force)?;
 
-        println!(
-            "[{}] Created new post at {}",
-            "prototool".green(),
-            post_path.to_string_lossy()
-        );
+        println!("Created new post at {}", post_path.to_string_lossy());
 
         let now = chrono::Local::now().naive_local();
 
