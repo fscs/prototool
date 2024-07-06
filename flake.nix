@@ -38,11 +38,10 @@
         (markdownFilter path type) || (craneLib.filterCargoSources path type);
 
       src = lib.cleanSourceWith {
-        src = craneLib.path ./.; # The original, unfiltered source
+        src = craneLib.path ./.;
         filter = markdownOrCargo;
       };
 
-      # Common arguments can be set here to avoid repeating them later
       commonArgs = {
         inherit src;
         strictDeps = true;
@@ -52,16 +51,10 @@
         ];
 
         buildInputs = with pkgs;
-          [
-            openssl
-          ]
+          []
           ++ lib.optionals pkgs.stdenv.isDarwin [
-            # Additional darwin specific inputs can be set here
             pkgs.libiconv
           ];
-
-        # Additional environment variables can be set directly
-        # MY_CUSTOM_VAR = "some value";
       };
 
       craneLibLLvmTools =
@@ -80,15 +73,8 @@
         });
     in {
       checks = {
-        # Build the crate as part of `nix flake check` for convenience
         inherit my-crate;
 
-        # Run clippy (and deny all warnings) on the crate source,
-        # again, reusing the dependency artifacts from above.
-        #
-        # Note that this is done as a separate derivation so that
-        # we can block the CI if there are issues here, but not
-        # prevent downstream consumers from building our crate by itself.
         my-crate-clippy = craneLib.cargoClippy (commonArgs
           // {
             inherit cargoArtifacts;
@@ -100,7 +86,6 @@
           inherit src;
         };
 
-        # Run tests with cargo-nextest
         # Consider setting `doCheck = false` on `my-crate` if you do not want
         # the tests to run twice
         my-crate-nextest = craneLib.cargoNextest (commonArgs
@@ -128,14 +113,6 @@
 
       devShells.default = craneLib.devShell {
         checks = self.checks.${system};
-
-        # Additional dev-shell environment variables can be set directly
-        # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
-
-        # Extra inputs can be added here; cargo and rustc are provided by default.
-        packages = [
-          # pkgs.ripgrep
-        ];
       };
     });
 }
