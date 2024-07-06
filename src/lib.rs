@@ -5,5 +5,5 @@
 #![warn(clippy::nursery)]
 
 pub mod post;
-pub mod sitzung;
 pub mod protokoll;
+pub mod sitzung;

@@ -43,9 +43,7 @@ mod filters {
 
     pub fn hidden_until_date(datetime: &NaiveDateTime) -> askama::Result<NaiveDate> {
         let date = datetime.date();
-        let result = date
-            .checked_add_days(Days::new(4))
-            .unwrap_or(date);
+        let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
 
         Ok(result)
     }

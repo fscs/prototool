@@ -191,7 +191,7 @@ impl GenerateCommand {
         println!("opening '{}'", pad_url);
 
         opener::open_browser(pad_url).context("unable to open pad url")?;
-            
+
         self.create_in_clipboard(template)
     }
 
