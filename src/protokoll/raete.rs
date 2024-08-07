@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -27,31 +27,38 @@ pub struct Abmeldung {
 pub fn fetch_persons(
     api_url: &Url,
     client: &Client,
-    datetime: &NaiveDateTime,
+    datetime: &NaiveDate,
 ) -> Result<Vec<Person>> {
     let endpoint = api_url.join("api/person/by-role/")?;
 
     let datestr = datetime.format("%Y-%m-%d").to_string();
-    let mut body = HashMap::new();
-    body.insert("rolle", "Rat");
-    body.insert("anfangsdatum", &datestr);
-    body.insert("ablaufdatum", &datestr);
+    let mut params = HashMap::new();
+    params.insert("rolle", "Rat");
+    params.insert("anfangsdatum", datestr.as_str());
+    params.insert("ablaufdatum", datestr.as_str());
 
     let response = client
         .get(endpoint)
-        .json(&body)
+        .json(&params)
         .send()
         .context("unable to fetch räte")?;
+    
     let persons = response.json().context("unable to deserialize räte")?;
 
     Ok(persons)
 }
 
-pub fn fetch_abmeldungen(api_url: &Url, client: &Client) -> Result<Vec<Abmeldung>> {
-    let endpoint = api_url.join("api/abmeldungen/next_sitzung/")?;
+pub fn fetch_abmeldungen(api_url: &Url, client: &Client, datetime: &NaiveDate) -> Result<Vec<Abmeldung>> {
+    let endpoint = api_url.join("api/abmeldungen/between/")?;
+
+    let datestr = datetime.format("%Y-%m-%d").to_string();
+    let mut params = HashMap::new();
+    params.insert("start", datestr.as_str());
+    params.insert("end", datestr.as_str());
 
     let response = client
         .get(endpoint)
+        .json(&params)
         .send()
         .context("unable to fetch abmeldungen")?;
 

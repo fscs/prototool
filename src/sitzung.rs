@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
 use reqwest::blocking::Client;
@@ -10,11 +12,15 @@ pub struct Sitzung {
     pub date: NaiveDateTime,
 }
 
-pub fn fetch_next_sitzung(api_url: &Url, client: &Client) -> Result<Sitzung> {
-    let endpoint = api_url.join("api/topmanager/next_sitzung/")?;
+pub fn fetch_sitzung(api_url: &Url, client: &Client, datetime: &NaiveDateTime) -> Result<Sitzung> {
+    let endpoint = api_url.join("api/topmanager/sitzung_by_date/")?;
+
+    let mut params = HashMap::new();
+    params.insert("datum", datetime);
 
     let response = client
         .get(endpoint)
+        .json(&params)
         .send()
         .context("unable to fetch next sitzung")?;
 

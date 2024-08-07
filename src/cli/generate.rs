@@ -65,7 +65,14 @@ impl Runnable for GenerateCommand {
         let client = Client::new();
 
         println!("fetching sitzung...");
-        let next_sitzung = sitzung::fetch_next_sitzung(&self.endpoint_url, &client)?;
+
+        let now = chrono::Utc::now()
+            .naive_local()
+            .date()
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
+
+        let next_sitzung = sitzung::fetch_sitzung(&self.endpoint_url, &client, &now)?;
         let timestamp = next_sitzung.date;
 
         if self.from_clipboard {
@@ -74,23 +81,7 @@ impl Runnable for GenerateCommand {
             return self.create_from_pad(&client, pad_url, &timestamp);
         }
 
-        println!("fetching tops...");
-        let tops = tops::fetch_current_tops(&self.endpoint_url, &client)?;
-
-        println!("fetching räte and withdrawals...");
-        let persons = raete::fetch_persons(&self.endpoint_url, &client, &timestamp)?;
-        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client)?;
-        let raete = raete::determine_present_räte(&persons, &abmeldungen);
-
-        println!("fetching events...");
-        let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
-
-        let template = ProtokollTemplate {
-            datetime: timestamp,
-            tops,
-            raete,
-            events,
-        };
+        let template = self.build_template(&client, &now)?;
 
         drop(client);
 
@@ -105,6 +96,30 @@ impl Runnable for GenerateCommand {
 }
 
 impl GenerateCommand {
+    fn build_template(
+        &self,
+        client: &Client,
+        timestamp: &NaiveDateTime,
+    ) -> Result<ProtokollTemplate> {
+        println!("fetching tops...");
+        let tops = tops::fetch_tops(&self.endpoint_url, client, timestamp)?;
+
+        println!("fetching räte and withdrawals...");
+        let persons = raete::fetch_persons(&self.endpoint_url, client, &timestamp.date())?;
+        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client, &timestamp.date())?;
+        let raete = raete::determine_present_räte(&persons, &abmeldungen);
+
+        println!("fetching events...");
+        let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
+
+        return Ok(ProtokollTemplate {
+            datetime: timestamp.to_owned(),
+            tops,
+            raete,
+            events,
+        });
+    }
+
     fn write_to_file(&self, timestamp: &NaiveDateTime, content: &str) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
         let path = format!(

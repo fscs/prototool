@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use anyhow::{Context, Result};
+use chrono::NaiveDateTime;
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -26,13 +29,17 @@ pub struct Top {
     pub top_type: TopType,
 }
 
-pub fn fetch_current_tops(api_url: &Url, client: &Client) -> Result<Vec<Top>> {
-    let endpoint = api_url.join("api/topmanager/current_tops/")?;
+pub fn fetch_tops(api_url: &Url, client: &Client, datetime: &NaiveDateTime) -> Result<Vec<Top>> {
+    let endpoint = api_url.join("api/topmanager/tops_by_date/")?;
+
+    let mut params = HashMap::new();
+    params.insert("datum", datetime.format("%Y-%m-%dT%H:%M:%S").to_string());
 
     let response = client
         .get(endpoint)
+        .json(&params)
         .send()
-        .context("unable to fetch current tops")?;
+        .context("unable to fetch tops")?;
 
     let mut tops: Vec<Top> = response.json().context("failed to deserialize tops")?;
 
