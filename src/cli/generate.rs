@@ -46,17 +46,17 @@ pub struct GenerateCommand {
     #[arg(long, short)]
     pub force: bool,
     /// Generate the protokoll into the system clipboard
-    #[arg(long)]
+    #[arg(long, alias = "tc")]
     pub to_clipboard: bool,
     /// Load the protokoll content from the system clipboard
-    #[arg(long)]
+    #[arg(long, alias = "fc")]
     pub from_clipboard: bool,
     /// Copies the protokolls content into the system clipboard and opens an appropriate
     /// pad url in the webbrowser
-    #[arg(long)]
+    #[arg(long, alias = "tp")]
     pub to_pad: bool,
     /// Load the protokoll content from a hedgedoc note
-    #[arg(long, value_name = "PAD_URL")]
+    #[arg(long, value_name = "PAD_URL", alias = "fp")]
     pub from_pad: Option<Url>,
 }
 
