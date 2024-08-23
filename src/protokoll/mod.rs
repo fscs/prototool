@@ -58,7 +58,10 @@ pub struct ProtokollTemplate {
 mod filters {
     use chrono::{Days, NaiveDate, NaiveDateTime};
 
-    use super::tops::{Top, TopType};
+    use super::{
+        tops::{Top, TopType},
+        Event,
+    };
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops
@@ -81,6 +84,18 @@ mod filters {
     pub fn hidden_until_date(datetime: &NaiveDateTime) -> askama::Result<NaiveDate> {
         let date = datetime.date();
         let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
+
+        Ok(result)
+    }
+
+    pub fn event_format(event: &Event) -> askama::Result<String> {
+        let result = format!(
+            "{} {} {} Uhr {}",
+            event.start.format("%d.%m."),
+            event.title.as_ref().map_or("", |e| e.as_str()),
+            event.start.format("%H:%M"),
+            event.location.as_ref().map_or("", |e| e.as_str()),
+        );
 
         Ok(result)
     }
@@ -220,13 +235,13 @@ mod tests {
             raete: vec![],
             events: vec![
                 Event {
-                    title: "Spieleabend".to_string(),
-                    location: "33er".to_string(),
+                    title: Some("Spieleabend".to_string()),
+                    location: Some("33er".to_string()),
                     start: Utc.with_ymd_and_hms(2042, 4, 5, 17, 00, 00).unwrap().into(),
                 },
                 Event {
-                    title: "Semestergrillen".to_string(),
-                    location: "Grillplätze bei der Mathe".to_string(),
+                    title: Some("Semestergrillen".to_string()),
+                    location: Some("Grillplätze bei der Mathe".to_string()),
                     start: Utc
                         .with_ymd_and_hms(2042, 4, 12, 17, 00, 00)
                         .unwrap()

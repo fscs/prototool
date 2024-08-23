@@ -73,7 +73,7 @@ _Top endet um T Uhr._
 
 ### Anstehende Veranstaltungen
 {%- for event in events ~%}
-- {{ event.start.format("%d.%m.") }} {{ event.title }} {{ event.start.format("%H:%M")}} Uhr {{ event.location }}
+- {{ event|event_format }}
 {%- endfor %}
 
 ### Sonstiges

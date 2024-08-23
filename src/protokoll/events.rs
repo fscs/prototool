@@ -7,8 +7,8 @@ use url::Url;
 #[derive(Debug, Deserialize)]
 pub struct Event {
     #[serde(rename = "summary")]
-    pub title: String,
-    pub location: String,
+    pub title: Option<String>,
+    pub location: Option<String>,
     pub start: DateTime<Local>,
 }
 
