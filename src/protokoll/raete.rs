@@ -24,11 +24,7 @@ pub struct Abmeldung {
     pub person_id: Uuid,
 }
 
-pub fn fetch_persons(
-    api_url: &Url,
-    client: &Client,
-    datetime: &NaiveDate,
-) -> Result<Vec<Person>> {
+pub fn fetch_persons(api_url: &Url, client: &Client, datetime: &NaiveDate) -> Result<Vec<Person>> {
     let endpoint = api_url.join("api/person/by-role/")?;
 
     let datestr = datetime.format("%Y-%m-%d").to_string();
@@ -42,13 +38,17 @@ pub fn fetch_persons(
         .json(&params)
         .send()
         .context("unable to fetch räte")?;
-    
+
     let persons = response.json().context("unable to deserialize räte")?;
 
     Ok(persons)
 }
 
-pub fn fetch_abmeldungen(api_url: &Url, client: &Client, datetime: &NaiveDate) -> Result<Vec<Abmeldung>> {
+pub fn fetch_abmeldungen(
+    api_url: &Url,
+    client: &Client,
+    datetime: &NaiveDate,
+) -> Result<Vec<Abmeldung>> {
     let endpoint = api_url.join("api/abmeldungen/between/")?;
 
     let datestr = datetime.format("%Y-%m-%d").to_string();
