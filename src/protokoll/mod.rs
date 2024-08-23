@@ -1,5 +1,8 @@
+use anyhow::{anyhow, bail, Result};
 use askama::Template;
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime};
+use markdown::mdast;
+use serde::Deserialize;
 
 pub mod events;
 pub mod raete;
@@ -8,6 +11,40 @@ pub mod tops;
 pub use events::Event;
 pub use raete::{Abmeldung, Person, Rat};
 pub use tops::{Antrag, Top, TopType};
+
+// helper struct for finding a protokolls creation date
+#[derive(Deserialize)]
+struct DateOrLastmod {
+    date: Option<NaiveDate>,
+    lastmod: Option<NaiveDate>,
+}
+
+/// finds the creation date of this protokoll by searching the frontmatter for
+/// the keys 'date' or 'lastmod'
+pub fn find_protokoll_date(protokoll: &mdast::Node) -> Result<NaiveDate> {
+    let Some(children) = protokoll.children() else {
+        bail!("document is empty");
+    };
+
+    let frontmatter = children
+        .iter()
+        .find(|e| matches!(e, mdast::Node::Toml(_) | mdast::Node::Yaml(_)))
+        .ok_or_else(|| anyhow!("no frontmatter found"))?;
+
+    let date_or_lastmod: DateOrLastmod = match frontmatter {
+        mdast::Node::Toml(toml) => toml::from_str(toml.value.as_str())?,
+        mdast::Node::Yaml(yaml) => serde_yaml::from_str(yaml.value.as_str())?,
+        _ => unreachable!(),
+    };
+
+    if let Some(date) = date_or_lastmod.date {
+        return Ok(date);
+    } else if let Some(lastmod) = date_or_lastmod.lastmod {
+        return Ok(lastmod);
+    } else {
+        bail!("neither 'date' or 'lastmod' set in frontmatter")
+    }
+}
 
 #[derive(Debug, Template)]
 #[template(path = "../templates/protokoll.md")]
@@ -60,7 +97,7 @@ mod tests {
 
     use super::ProtokollTemplate;
     use askama::Template;
-    use chrono::{NaiveDate, TimeZone, Utc};
+    use chrono::{NaiveDate, NaiveDateTime, TimeZone, Utc};
     use pretty_assertions::assert_eq;
 
     static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
@@ -200,5 +237,55 @@ mod tests {
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_EVENTS);
+    }
+
+    #[test]
+    fn find_protokoll_date() {
+        let protokoll = r#"---
+title: "Protokoll vom 27.05.2022"
+date: "2022-05-27"
+---
+        "#;
+
+        let markdown_opts = markdown::ParseOptions {
+            constructs: markdown::Constructs {
+                frontmatter: true,
+                ..Default::default()
+            },
+            ..markdown::ParseOptions::default()
+        };
+
+        let mdast = markdown::to_mdast(protokoll, &markdown_opts).unwrap();
+
+        let timestamp = super::find_protokoll_date(&mdast).unwrap();
+
+        let expected = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
+
+        assert_eq!(timestamp, expected);
+    }
+
+    #[test]
+    fn find_protokoll_lastmod() {
+        let protokoll = r#"---
+title: "Protokoll vom 27.05.2022"
+lastmod: "2022-05-27"
+---
+        "#;
+
+        let markdown_opts = markdown::ParseOptions {
+            constructs: markdown::Constructs {
+                frontmatter: true,
+                ..markdown::Constructs::gfm()
+            },
+            ..markdown::ParseOptions::default()
+        };
+
+        let mdast = markdown::to_mdast(protokoll, &markdown_opts).unwrap();
+
+        let timestamp = super::find_protokoll_date(&mdast).unwrap();
+
+        let expected = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
+
+        assert_eq!(timestamp, expected);
     }
 }

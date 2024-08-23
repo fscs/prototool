@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::NaiveDate;
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;

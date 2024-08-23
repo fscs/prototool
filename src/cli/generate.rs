@@ -2,7 +2,7 @@ use std::fs;
 
 use std::fs::OpenOptions;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use askama::Template;
 
 use arboard::Clipboard;
@@ -14,13 +14,13 @@ use libc::fork;
 #[cfg(target_os = "linux")]
 use rustix::stdio::{dup2_stdin, dup2_stdout};
 
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime};
 use clap::{ArgGroup, Args};
 use reqwest::blocking::Client;
 use url::Url;
 
 use super::Runnable;
-use prototool::protokoll::ProtokollTemplate;
+use prototool::protokoll::{self, ProtokollTemplate};
 
 use prototool::post;
 use prototool::protokoll::{events, raete, tops};
@@ -64,33 +64,35 @@ impl Runnable for GenerateCommand {
     fn run(&self) -> Result<()> {
         let client = Client::new();
 
-        println!("fetching sitzung...");
+        if self.from_clipboard {
+            return self.create_from_clipboard();
+        } else if let Some(pad_url) = &self.from_pad {
+            return self.create_from_pad(&client, pad_url);
+        }
 
+        #[allow(clippy::unwrap_used)]
         let now = chrono::Utc::now()
             .naive_local()
             .date()
             .and_hms_opt(0, 0, 0)
             .unwrap();
 
+        let template = self.build_template(&client, &now)?;
+
+        println!("fetching sitzung...");
+
         let next_sitzung = sitzung::fetch_sitzung(&self.endpoint_url, &client, &now)?;
         let timestamp = next_sitzung.date;
 
-        if self.from_clipboard {
-            return self.create_from_clipboard(&timestamp);
-        } else if let Some(pad_url) = &self.from_pad {
-            return self.create_from_pad(&client, pad_url, &timestamp);
-        }
-
-        let template = self.build_template(&client, &now)?;
-
+        // create_in_clipboard might fork, so we drop this here
         drop(client);
 
         if self.to_clipboard {
             self.create_in_clipboard(template)
         } else if self.to_pad {
-            self.create_in_pad(&timestamp, template)
+            self.create_in_pad(&timestamp.date(), template)
         } else {
-            self.create_locally(&timestamp, template)
+            self.create_locally(&timestamp.date(), template)
         }
     }
 }
@@ -106,11 +108,11 @@ impl GenerateCommand {
 
         println!("fetching räte and withdrawals...");
         let persons = raete::fetch_persons(&self.endpoint_url, client, &timestamp.date())?;
-        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, &client, &timestamp.date())?;
+        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, client, &timestamp.date())?;
         let raete = raete::determine_present_räte(&persons, &abmeldungen);
 
         println!("fetching events...");
-        let events = events::fetch_calendar_events(&self.endpoint_url, &client)?;
+        let events = events::fetch_calendar_events(&self.endpoint_url, client)?;
 
         return Ok(ProtokollTemplate {
             datetime: timestamp.to_owned(),
@@ -120,7 +122,7 @@ impl GenerateCommand {
         });
     }
 
-    fn write_to_file(&self, timestamp: &NaiveDateTime, content: &str) -> Result<()> {
+    fn write_to_file(&self, timestamp: &NaiveDate, content: &str) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
         let path = format!(
             "protokolle/{}/{}-protokoll.md",
@@ -141,7 +143,7 @@ impl GenerateCommand {
         Ok(())
     }
 
-    fn create_locally(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
+    fn create_locally(&self, timestamp: &NaiveDate, template: ProtokollTemplate) -> Result<()> {
         let rendered = template
             .render()
             .context("error while rendering template")?;
@@ -198,7 +200,7 @@ impl GenerateCommand {
         Ok(())
     }
 
-    fn create_in_pad(&self, timestamp: &NaiveDateTime, template: ProtokollTemplate) -> Result<()> {
+    fn create_in_pad(&self, timestamp: &NaiveDate, template: ProtokollTemplate) -> Result<()> {
         let pad_url = timestamp
             .format("https://pad.hhu.de/%Y-%m-%d-FSR-Informatik")
             .to_string();
@@ -210,20 +212,29 @@ impl GenerateCommand {
         self.create_in_clipboard(template)
     }
 
-    fn create_from_clipboard(&self, timestamp: &NaiveDateTime) -> Result<()> {
+    fn create_from_clipboard(&self) -> Result<()> {
         let mut clipboard = Clipboard::new().context("unable to access clipboard")?;
 
         let content = clipboard.get_text().context("unable to read clipboard")?;
 
-        self.write_to_file(timestamp, content.as_str())
+        let markdown_opts = markdown::ParseOptions {
+            constructs: markdown::Constructs {
+                frontmatter: true,
+                ..markdown::Constructs::gfm()
+            },
+            ..markdown::ParseOptions::default()
+        };
+
+        let mdast = markdown::to_mdast(content.as_str(), &markdown_opts)
+            .map_err(|_| anyhow!("unable to parse pad contents"))?;
+
+        let timestamp =
+            protokoll::find_protokoll_date(&mdast).context("unable to determine protokoll date")?;
+
+        self.write_to_file(&timestamp, content.as_str())
     }
 
-    fn create_from_pad(
-        &self,
-        client: &Client,
-        pad_url: &Url,
-        timestamp: &NaiveDateTime,
-    ) -> Result<()> {
+    fn create_from_pad(&self, client: &Client, pad_url: &Url) -> Result<()> {
         // im not sure how this behaves with non http urls...
         let url_base = pad_url.origin().unicode_serialization();
         let url_path = pad_url.path();
@@ -241,6 +252,20 @@ impl GenerateCommand {
             .text()
             .context("unable to determine content from response")?;
 
-        self.write_to_file(timestamp, content.as_str())
+        let markdown_opts = markdown::ParseOptions {
+            constructs: markdown::Constructs {
+                frontmatter: true,
+                ..markdown::Constructs::gfm()
+            },
+            ..markdown::ParseOptions::default()
+        };
+
+        let mdast = markdown::to_mdast(content.as_str(), &markdown_opts)
+            .map_err(|_| anyhow!("unable to parse pad contents"))?;
+
+        let timestamp =
+            protokoll::find_protokoll_date(&mdast).context("unable to determine protokoll date")?;
+
+        self.write_to_file(&timestamp, content.as_str())
     }
 }
