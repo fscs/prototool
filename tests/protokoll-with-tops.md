@@ -44,8 +44,8 @@ _Top endet um T Uhr._
 Weil wir Valentin toll finden
 
 ```vote-success
-Die Fachschaft Informatik beschließt
-Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
+Die Fachschaft Informatik beschließt  
+Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen  
 ```
 
 _Top endet um T Uhr._
@@ -56,16 +56,16 @@ _Top endet um T Uhr._
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
-Die Fachschaft Informatik beschließt
-Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
+Die Fachschaft Informatik beschließt  
+Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen  
 ```
 
 ### Antrag: Hahn für Voltzapfanlage
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
-Die Fachschaft Informatik beschließt
-Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
+Die Fachschaft Informatik beschließt  
+Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen  
 ```
 
 _Top endet um T Uhr._

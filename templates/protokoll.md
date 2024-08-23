@@ -61,8 +61,8 @@ _Top endet um T Uhr._
 {{ antrag.begründung }}
 
 ```vote-success
-{{antrag.antragstext}}
-Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
+{{antrag.antragstext}}  
+Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen  
 ```
 {% endfor ~%}
 
