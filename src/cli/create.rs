@@ -24,13 +24,18 @@ impl Runnable for NewCommand {
     fn run(&self) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
 
-        let post_path = post::create_post(&cwd, &self.lang, self.path.as_str(), self.force)?;
+        let now = chrono::Local::now().naive_local();
+        let content = post::render_post_template(&now).context("error while rendering template")?;
+
+        let post_path = post::create_post(
+            content.as_str(),
+            &cwd,
+            &self.lang,
+            self.path.as_str(),
+            self.force,
+        )?;
 
         println!("created new post at {}", post_path.to_string_lossy());
-
-        let now = chrono::Local::now().naive_local();
-
-        post::write_post_template(&post_path, &now)?;
 
         if self.edit {
             post::edit(&post_path)?;

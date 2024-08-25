@@ -129,11 +129,9 @@ impl GenerateCommand {
             timestamp.format("%m-%d"),
         );
 
-        let file_path = post::create_post(&cwd, &self.lang, &path, self.force)?;
+        let file_path = post::create_post(content, &cwd, &self.lang, &path, self.force)?;
 
-        fs::write(&file_path, content)?;
-
-        println!("created Protokoll at '{}'", file_path.to_string_lossy());
+        println!("created protokoll at '{}'", file_path.to_string_lossy());
 
         if self.edit {
             post::edit(&file_path)?

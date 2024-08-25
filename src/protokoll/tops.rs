@@ -34,7 +34,7 @@ pub fn fetch_tops(api_url: &Url, client: &Client, datetime: &NaiveDateTime) -> R
 
     let mut params = HashMap::new();
     params.insert("datum", datetime.format("%Y-%m-%dT%H:%M:%S").to_string());
-
+    
     let response = client
         .get(endpoint)
         .json(&params)
