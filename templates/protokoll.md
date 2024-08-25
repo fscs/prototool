@@ -1,8 +1,8 @@
 ---
-title: "Protokoll vom {{datetime.format("%d.%m.%Y")}}"
-date: "{{ datetime.format("%Y-%m-%d") }}"
+title: "{{ sitzung|protokoll_title }}"
+date: "{{ sitzung.datetime.format("%Y-%m-%d") }}"
 draft: true
-hiddenUntil: "{{ (datetime|hidden_until_date).format("%Y-%m-%d") }}"
+hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 ---
 
 <details>
@@ -24,7 +24,11 @@ hiddenUntil: "{{ (datetime|hidden_until_date).format("%Y-%m-%d") }}"
 {% endif -%}
 {%- endfor ~%}
 
+{%~ if sitzung.sitzung_type == SitzungType::VV || sitzung.sitzung_type == SitzungType::WahlVV -%}
+#### Weitere Studis
+{%- else -%}
 #### Gäste
+{%- endif %}
 
 </details>
 
@@ -33,10 +37,15 @@ hiddenUntil: "{{ (datetime|hidden_until_date).format("%Y-%m-%d") }}"
 - Redeleitung: 
 - Protokoll: 
 - Startzeit: 
-- Endzeit: 
+- Endzeit: {# this comment is a hack to sneak in a whitespace at the end of the line #}
+{%~ if sitzung.sitzung_type == SitzungType::VV || sitzung.sitzung_type == SitzungType::WahlVV -%}
+- Wir sind mit n Studierenden vorläufig beschlussfähig
+- Wir nehmen das Protokoll der letzten VV einstimmig an
+{% else -%}
 - Wir sind mit n von {{ raete.len() }} Rätys beschlussfähig
-- Wir nehmen die unten aufgelistete Topliste einstimmig an
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+{% endif -%}
+- Wir nehmen die unten aufgelistete Topliste einstimmig an
 
 ## Top 1: Berichte, Mail und Post
 
@@ -49,7 +58,7 @@ hiddenUntil: "{{ (datetime|hidden_until_date).format("%Y-%m-%d") }}"
 ### ToDo's
 
 _Top endet um T Uhr._
-{% for top in tops|normal_tops  %}
+{% for top in tops|normal_tops %}
 ## Top {{ loop.index0 + 2 }}: {{top.name}}
 
 {%~ for antrag in top.anträge -%}

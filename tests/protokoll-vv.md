@@ -1,5 +1,5 @@
 ---
-title: "Protokoll vom 27.05.2022"
+title: "VV-Protokoll vom 27.05.2022"
 date: "2022-05-27"
 draft: true
 hiddenUntil: "2022-05-31"
@@ -14,7 +14,7 @@ hiddenUntil: "2022-05-31"
 
 #### Entschuldigte Rätys
 
-#### Gäste
+#### Weitere Studis
 
 </details>
 
@@ -24,8 +24,8 @@ hiddenUntil: "2022-05-31"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 0 Rätys beschlussfähig
-- Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+- Wir sind mit n Studierenden vorläufig beschlussfähig
+- Wir nehmen das Protokoll der letzten VV einstimmig an
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
 ## Top 1: Berichte, Mail und Post

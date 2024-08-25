@@ -6,10 +6,21 @@ use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
 
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub enum SitzungType {
+    Normal,
+    VV,
+    WahlVV,
+    Ersatz,
+    Konsti,
+    Dringlichkeit,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Sitzung {
     #[serde(rename = "datum")]
-    pub date: NaiveDateTime,
+    pub datetime: NaiveDateTime,
+    pub sitzung_type: SitzungType,
 }
 
 pub fn fetch_sitzung(api_url: &Url, client: &Client, datetime: &NaiveDateTime) -> Result<Sitzung> {

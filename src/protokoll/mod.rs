@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail, Result};
 use askama::Template;
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::NaiveDate;
 use markdown::mdast;
 use serde::Deserialize;
 
@@ -11,6 +11,8 @@ pub mod tops;
 pub use events::Event;
 pub use raete::{Abmeldung, Person, Rat};
 pub use tops::{Antrag, Top, TopType};
+
+use crate::sitzung::{Sitzung, SitzungType};
 
 // helper struct for finding a protokolls creation date
 #[derive(Deserialize)]
@@ -49,14 +51,17 @@ pub fn find_protokoll_date(protokoll: &mdast::Node) -> Result<NaiveDate> {
 #[derive(Debug, Template)]
 #[template(path = "../templates/protokoll.md")]
 pub struct ProtokollTemplate {
+    pub sitzung: Sitzung,
     pub tops: Vec<Top>,
     pub raete: Vec<Rat>,
     pub events: Vec<Event>,
-    pub datetime: NaiveDateTime,
 }
 
+// these are functions available within the template
 mod filters {
     use chrono::{Days, NaiveDate, NaiveDateTime};
+
+    use crate::sitzung::{Sitzung, SitzungType};
 
     use super::{
         tops::{Top, TopType},
@@ -99,11 +104,25 @@ mod filters {
 
         Ok(result)
     }
+
+    pub fn protokoll_title(sitzung: &Sitzung) -> askama::Result<String> {
+        let prefix = match &sitzung.sitzung_type {
+            SitzungType::VV | SitzungType::WahlVV => "VV-Protokoll",
+            SitzungType::Konsti => "Konsti-Protokoll",
+            _ => "Protokoll",
+        };
+
+        let result = format!("{} vom {}", prefix, sitzung.datetime.format("%d.%m.%Y"));
+
+        Ok(result)
+    }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use crate::sitzung::{Sitzung, SitzungType};
+
     use super::{
         events::Event,
         raete::Rat,
@@ -116,6 +135,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
+    static PROTOKOLL_VV: &str = include_str!("../../tests/protokoll-vv.md");
     static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
     static PROTOKOLL_WITH_EVENTS: &str = include_str!("../../tests/protokoll-with-events.md");
@@ -123,10 +143,13 @@ mod tests {
     #[test]
     fn render_without_tops() {
         let template = ProtokollTemplate {
-            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
-                .unwrap()
-                .and_hms_opt(7, 30, 15)
-                .unwrap(),
+            sitzung: Sitzung {
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap(),
+                sitzung_type: SitzungType::Normal,
+            },
             raete: vec![],
             events: vec![],
             tops: vec![],
@@ -134,14 +157,35 @@ mod tests {
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_NO_TOPS);
     }
+    
+    #[test]
+    fn render_vv() {
+        let template = ProtokollTemplate {
+            sitzung: Sitzung {
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap(),
+                sitzung_type: SitzungType::VV,
+            },
+            raete: vec![],
+            events: vec![],
+            tops: vec![],
+        };
+
+        assert_eq!(template.render().unwrap(), PROTOKOLL_VV);
+    }
 
     #[test]
     fn render_with_tops() {
         let template = ProtokollTemplate {
-            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
-                .unwrap()
-                .and_hms_opt(7, 30, 15)
-                .unwrap(),
+            sitzung: Sitzung {
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap(),
+                sitzung_type: SitzungType::Normal,
+            },
             events: vec![],
             raete: vec![],
             tops: vec![
@@ -191,10 +235,13 @@ mod tests {
     #[test]
     fn render_with_räte() {
         let template = ProtokollTemplate {
-            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
-                .unwrap()
-                .and_hms_opt(7, 30, 15)
-                .unwrap(),
+            sitzung: Sitzung {
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap(),
+                sitzung_type: SitzungType::Normal,
+            },
             raete: vec![
                 Rat {
                     name: "Valentin".to_string(),
@@ -228,10 +275,13 @@ mod tests {
     // randomly breaks because of timezone issues.. bad test
     fn render_with_events() {
         let template = ProtokollTemplate {
-            datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
-                .unwrap()
-                .and_hms_opt(7, 30, 15)
-                .unwrap(),
+            sitzung: Sitzung {
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap(),
+                sitzung_type: SitzungType::Normal,
+            },
             raete: vec![],
             events: vec![
                 Event {

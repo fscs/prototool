@@ -79,20 +79,15 @@ impl Runnable for GenerateCommand {
 
         let template = self.build_template(&client, &now)?;
 
-        println!("fetching sitzung...");
-
-        let next_sitzung = sitzung::fetch_sitzung(&self.endpoint_url, &client, &now)?;
-        let timestamp = next_sitzung.date;
-
         // create_in_clipboard might fork, so we drop this here
         drop(client);
 
         if self.to_clipboard {
             self.create_in_clipboard(template)
         } else if self.to_pad {
-            self.create_in_pad(&timestamp.date(), template)
+            self.create_in_pad(template)
         } else {
-            self.create_locally(&timestamp.date(), template)
+            self.create_locally(template)
         }
     }
 }
@@ -101,10 +96,14 @@ impl GenerateCommand {
     fn build_template(
         &self,
         client: &Client,
-        timestamp: &NaiveDateTime,
+        sitzung_date: &NaiveDateTime,
     ) -> Result<ProtokollTemplate> {
+        println!("fetching sitzung...");
+        let sitzung = sitzung::fetch_sitzung(&self.endpoint_url, client, sitzung_date)?;
+        let timestamp = sitzung.datetime;
+
         println!("fetching tops...");
-        let tops = tops::fetch_tops(&self.endpoint_url, client, timestamp)?;
+        let tops = tops::fetch_tops(&self.endpoint_url, client, &timestamp)?;
 
         println!("fetching räte and withdrawals...");
         let persons = raete::fetch_persons(&self.endpoint_url, client, &timestamp.date())?;
@@ -115,7 +114,7 @@ impl GenerateCommand {
         let events = events::fetch_calendar_events(&self.endpoint_url, client)?;
 
         return Ok(ProtokollTemplate {
-            datetime: timestamp.to_owned(),
+            sitzung,
             tops,
             raete,
             events,
@@ -143,12 +142,12 @@ impl GenerateCommand {
         Ok(())
     }
 
-    fn create_locally(&self, timestamp: &NaiveDate, template: ProtokollTemplate) -> Result<()> {
+    fn create_locally(&self, template: ProtokollTemplate) -> Result<()> {
         let rendered = template
             .render()
             .context("error while rendering template")?;
 
-        self.write_to_file(timestamp, rendered.as_str())
+        self.write_to_file(&template.sitzung.datetime.date(), rendered.as_str())
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -200,8 +199,10 @@ impl GenerateCommand {
         Ok(())
     }
 
-    fn create_in_pad(&self, timestamp: &NaiveDate, template: ProtokollTemplate) -> Result<()> {
-        let pad_url = timestamp
+    fn create_in_pad(&self, template: ProtokollTemplate) -> Result<()> {
+        let pad_url = template
+            .sitzung
+            .datetime
             .format("https://pad.hhu.de/%Y-%m-%d-FSR-Informatik")
             .to_string();
 

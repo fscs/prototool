@@ -25,8 +25,8 @@ hiddenUntil: "2022-05-31"
 - Startzeit: 
 - Endzeit: 
 - Wir sind mit n von 0 Rätys beschlussfähig
-- Wir nehmen die unten aufgelistete Topliste einstimmig an
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+- Wir nehmen die unten aufgelistete Topliste einstimmig an
 
 ## Top 1: Berichte, Mail und Post
 
