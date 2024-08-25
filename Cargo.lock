@@ -1124,7 +1124,7 @@ dependencies = [
 
 [[package]]
 name = "prototool"
-version = "0.6.1"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "arboard",
