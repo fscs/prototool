@@ -7,4 +7,3 @@
 
 pub mod post;
 pub mod protokoll;
-pub mod sitzung;

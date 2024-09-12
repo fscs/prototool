@@ -24,7 +24,7 @@ hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 {% endif -%}
 {%- endfor ~%}
 
-{%~ if sitzung.sitzung_type == SitzungType::VV || sitzung.sitzung_type == SitzungType::WahlVV -%}
+{%~ if sitzung.kind == SitzungKind::VV || sitzung.kind == SitzungKind::WahlVV -%}
 #### Weitere Studis
 {%- else -%}
 #### Gäste
@@ -38,7 +38,7 @@ hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: {# this comment is a hack to sneak in a whitespace at the end of the line #}
-{%~ if sitzung.sitzung_type == SitzungType::VV || sitzung.sitzung_type == SitzungType::WahlVV -%}
+{%~ if sitzung.kind == SitzungKind::VV || sitzung.kind == SitzungKind::WahlVV -%}
 - Wir sind mit n Studierenden vorläufig beschlussfähig
 - Wir nehmen das Protokoll der letzten VV einstimmig an
 {% else -%}
@@ -58,7 +58,7 @@ hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 ### ToDo's
 
 _Top endet um T Uhr._
-{% for top in tops|normal_tops %}
+{% for top in sitzung.tops|normal_tops %}
 ## Top {{ loop.index0 + 2 }}: {{top.name}}
 
 {%~ for antrag in top.anträge -%}
@@ -78,7 +78,7 @@ Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen
 _Top endet um T Uhr._
 {% endfor ~%}
 
-## Top {{(tops|normal_tops).len() + 2}}: Verschiedenes
+## Top {{(sitzung.tops|normal_tops).len() + 2}}: Verschiedenes
 
 ### Anstehende Veranstaltungen
 {%- for event in events ~%}
@@ -86,7 +86,7 @@ _Top endet um T Uhr._
 {%- endfor %}
 
 ### Sonstiges
-{% for top in tops|sonstige_tops -%}
+{% for top in sitzung.tops|verschiedenes_tops -%}
 {%~ for antrag in top.anträge ~%}
 
 #### {{ antrag.titel }}

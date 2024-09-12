@@ -1,5 +1,3 @@
-use std::fs;
-
 use std::fs::OpenOptions;
 
 use anyhow::{anyhow, Context, Result};
@@ -14,17 +12,15 @@ use libc::fork;
 #[cfg(target_os = "linux")]
 use rustix::stdio::{dup2_stdin, dup2_stdout};
 
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::{DateTime, Local, NaiveDate, NaiveTime};
 use clap::{ArgGroup, Args};
 use reqwest::blocking::Client;
 use url::Url;
 
 use super::Runnable;
-use prototool::protokoll::{self, ProtokollTemplate};
+use prototool::protokoll::{self, events, person, sitzung, ProtokollTemplate};
 
 use prototool::post;
-use prototool::protokoll::{events, raete, tops};
-use prototool::sitzung;
 
 /// Generate a new Protokoll
 #[derive(Debug, Args)]
@@ -71,13 +67,11 @@ impl Runnable for GenerateCommand {
         }
 
         #[allow(clippy::unwrap_used)]
-        let now = chrono::Utc::now()
-            .naive_local()
-            .date()
-            .and_hms_opt(0, 0, 0)
+        let now = chrono::Local::now()
+            .with_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
             .unwrap();
 
-        let template = self.build_template(&client, &now)?;
+        let template = self.build_template(&client, now)?;
 
         // create_in_clipboard might fork, so we drop this here
         drop(client);
@@ -96,27 +90,22 @@ impl GenerateCommand {
     fn build_template(
         &self,
         client: &Client,
-        sitzung_date: &NaiveDateTime,
+        sitzung_date: DateTime<Local>,
     ) -> Result<ProtokollTemplate> {
         println!("fetching sitzung...");
         let sitzung = sitzung::fetch_sitzung(&self.endpoint_url, client, sitzung_date)?;
-        let timestamp = sitzung.datetime;
-
-        println!("fetching tops...");
-        let tops = tops::fetch_tops(&self.endpoint_url, client, &timestamp)?;
 
         println!("fetching räte and withdrawals...");
-        let persons = raete::fetch_persons(&self.endpoint_url, client, &timestamp.date())?;
-        let abmeldungen = raete::fetch_abmeldungen(&self.endpoint_url, client, &timestamp.date())?;
-        let raete = raete::determine_present_räte(&persons, &abmeldungen);
+        let raete = person::fetch_raete(&self.endpoint_url, client)?;
+        let abmeldungen = person::fetch_abmeldungen(&self.endpoint_url, client, &sitzung)?;
+        let raete_and_abmeldung = person::determine_present_räte(&raete, &abmeldungen);
 
         println!("fetching events...");
         let events = events::fetch_calendar_events(&self.endpoint_url, client)?;
 
         return Ok(ProtokollTemplate {
             sitzung,
-            tops,
-            raete,
+            raete: raete_and_abmeldung,
             events,
         });
     }
@@ -145,7 +134,7 @@ impl GenerateCommand {
             .render()
             .context("error while rendering template")?;
 
-        self.write_to_file(&template.sitzung.datetime.date(), rendered.as_str())
+        self.write_to_file(&template.sitzung.datetime.date_naive(), rendered.as_str())
     }
 
     #[cfg(not(target_os = "linux"))]

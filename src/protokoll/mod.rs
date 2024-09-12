@@ -5,14 +5,12 @@ use markdown::mdast;
 use serde::Deserialize;
 
 pub mod events;
-pub mod raete;
-pub mod tops;
+pub mod person;
+pub mod sitzung;
 
 pub use events::Event;
-pub use raete::{Abmeldung, Person, Rat};
-pub use tops::{Antrag, Top, TopType};
-
-use crate::sitzung::{Sitzung, SitzungType};
+pub use person::{Abmeldung, Person, PersonWithAbmeldung};
+pub use sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind};
 
 // helper struct for finding a protokolls creation date
 #[derive(Deserialize)]
@@ -52,42 +50,33 @@ pub fn find_protokoll_date(protokoll: &mdast::Node) -> Result<NaiveDate> {
 #[template(path = "../templates/protokoll.md")]
 pub struct ProtokollTemplate {
     pub sitzung: Sitzung,
-    pub tops: Vec<Top>,
-    pub raete: Vec<Rat>,
+    pub raete: Vec<PersonWithAbmeldung>,
     pub events: Vec<Event>,
 }
 
 // these are functions available within the template
 mod filters {
-    use chrono::{Days, NaiveDate, NaiveDateTime};
+    use chrono::{DateTime, Days, Local, NaiveDate};
 
-    use crate::sitzung::{Sitzung, SitzungType};
-
-    use super::{
-        tops::{Top, TopType},
-        Event,
-    };
+    use super::{Event, Sitzung, SitzungKind, Top, TopKind};
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
+        let result = tops.iter().filter(|e| e.kind == TopKind::Normal).collect();
+
+        Ok(result)
+    }
+
+    pub fn verschiedenes_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops
             .iter()
-            .filter(|e| e.top_type == TopType::Normal)
+            .filter(|e| e.kind == TopKind::Verschiedenes)
             .collect();
 
         Ok(result)
     }
 
-    pub fn sonstige_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
-        let result = tops
-            .iter()
-            .filter(|e| e.top_type == TopType::Sonstige)
-            .collect();
-
-        Ok(result)
-    }
-
-    pub fn hidden_until_date(datetime: &NaiveDateTime) -> askama::Result<NaiveDate> {
-        let date = datetime.date();
+    pub fn hidden_until_date(datetime: &DateTime<Local>) -> askama::Result<NaiveDate> {
+        let date = datetime.date_naive();
         let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
 
         Ok(result)
@@ -106,9 +95,9 @@ mod filters {
     }
 
     pub fn protokoll_title(sitzung: &Sitzung) -> askama::Result<String> {
-        let prefix = match &sitzung.sitzung_type {
-            SitzungType::VV | SitzungType::WahlVV => "VV-Protokoll",
-            SitzungType::Konsti => "Konsti-Protokoll",
+        let prefix = match &sitzung.kind {
+            SitzungKind::VV | SitzungKind::WahlVV => "VV-Protokoll",
+            SitzungKind::Konsti => "Konsti-Protokoll",
             _ => "Protokoll",
         };
 
@@ -121,56 +110,69 @@ mod filters {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use crate::sitzung::{Sitzung, SitzungType};
-
     use super::{
-        events::Event,
-        raete::Rat,
-        tops::{Antrag, Top, TopType},
+        person::PersonWithAbmeldung,
+        sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind},
     };
 
     use super::ProtokollTemplate;
     use askama::Template;
-    use chrono::{NaiveDate, NaiveDateTime, TimeZone, Utc};
+    use chrono::{FixedOffset, NaiveDate};
     use pretty_assertions::assert_eq;
+    use uuid::Uuid;
 
     static PROTOKOLL_NO_TOPS: &str = include_str!("../../tests/protokoll-no-tops.md");
     static PROTOKOLL_VV: &str = include_str!("../../tests/protokoll-vv.md");
     static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
-    static PROTOKOLL_WITH_EVENTS: &str = include_str!("../../tests/protokoll-with-events.md");
+
+    // im quite sure we still fuck up the timezone faking and im not sure if we can actually do
+    // anything about it when using DateTime<Local>. ATM this isnt a problem tho because we dont
+    // care about the Time anyway and only the Date matters
+
+    fn tz_offset() -> FixedOffset {
+        FixedOffset::east_opt(3 * 60 * 60).unwrap()
+    }
 
     #[test]
     fn render_without_tops() {
         let template = ProtokollTemplate {
             sitzung: Sitzung {
+                id: Uuid::parse_str("efc794db-5d32-4186-a7d6-5fe6eee70452").unwrap(),
                 datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
                     .unwrap()
                     .and_hms_opt(7, 30, 15)
-                    .unwrap(),
-                sitzung_type: SitzungType::Normal,
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap()
+                    .into(),
+                kind: SitzungKind::Normal,
+                tops: vec![],
             },
             raete: vec![],
             events: vec![],
-            tops: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_NO_TOPS);
     }
-    
+
     #[test]
     fn render_vv() {
         let template = ProtokollTemplate {
             sitzung: Sitzung {
+                id: Uuid::parse_str("efc794db-5d32-4186-a7d6-5fe6eee70452").unwrap(),
                 datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
                     .unwrap()
                     .and_hms_opt(7, 30, 15)
-                    .unwrap(),
-                sitzung_type: SitzungType::VV,
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap()
+                    .into(),
+                kind: SitzungKind::VV,
+                tops: vec![],
             },
             raete: vec![],
             events: vec![],
-            tops: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_VV);
@@ -180,53 +182,58 @@ mod tests {
     fn render_with_tops() {
         let template = ProtokollTemplate {
             sitzung: Sitzung {
+                id: Uuid::parse_str("efc794db-5d32-4186-a7d6-5fe6eee70452").unwrap(),
                 datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
                     .unwrap()
                     .and_hms_opt(7, 30, 15)
-                    .unwrap(),
-                sitzung_type: SitzungType::Normal,
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap()
+                    .into(),
+                kind: SitzungKind::Normal,
+                tops: vec![
+                    Top {
+                        name: "Blumen für Valentin".to_string(),
+                        weight: 1,
+                        kind: TopKind::Normal,
+                        anträge: vec![Antrag {
+                            titel: "Blumen für Valentin".to_string(),
+                            antragstext: "Die Fachschaft Informatik beschließt".to_string(),
+                            begründung: "Weil wir Valentin toll finden".to_string(),
+                        }],
+                    },
+                    Top {
+                        name: "Voltpfand".to_string(),
+                        weight: 1,
+                        kind: TopKind::Verschiedenes,
+                        anträge: vec![Antrag {
+                            titel: "Voltpfand".to_string(),
+                            antragstext: "aint nobody got time for that".to_string(),
+                            begründung: "Der Voltpfand muss dringend weggebracht werden."
+                                .to_string(),
+                        }],
+                    },
+                    Top {
+                        name: "Volt Zapfanlage".to_string(),
+                        weight: 2,
+                        kind: TopKind::Normal,
+                        anträge: vec![
+                            Antrag {
+                                titel: "Tank für Voltzapfanlage".to_string(),
+                                antragstext: "Die Fachschaft Informatik beschließt".to_string(),
+                                begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                            },
+                            Antrag {
+                                titel: "Hahn für Voltzapfanlage".to_string(),
+                                antragstext: "Die Fachschaft Informatik beschließt".to_string(),
+                                begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                            },
+                        ],
+                    },
+                ],
             },
             events: vec![],
             raete: vec![],
-            tops: vec![
-                Top {
-                    name: "Blumen für Valentin".to_string(),
-                    weight: 1,
-                    top_type: TopType::Normal,
-                    anträge: vec![Antrag {
-                        titel: "Blumen für Valentin".to_string(),
-                        antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                        begründung: "Weil wir Valentin toll finden".to_string(),
-                    }],
-                },
-                Top {
-                    name: "Voltpfand".to_string(),
-                    weight: 1,
-                    top_type: TopType::Sonstige,
-                    anträge: vec![Antrag {
-                        titel: "Voltpfand".to_string(),
-                        antragstext: "aint nobody got time for that".to_string(),
-                        begründung: "Der Voltpfand muss dringend weggebracht werden.".to_string(),
-                    }],
-                },
-                Top {
-                    name: "Volt Zapfanlage".to_string(),
-                    weight: 2,
-                    top_type: TopType::Normal,
-                    anträge: vec![
-                        Antrag {
-                            titel: "Tank für Voltzapfanlage".to_string(),
-                            antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                            begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                        },
-                        Antrag {
-                            titel: "Hahn für Voltzapfanlage".to_string(),
-                            antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                            begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                        },
-                    ],
-                },
-            ],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_TOPS);
@@ -236,72 +243,43 @@ mod tests {
     fn render_with_räte() {
         let template = ProtokollTemplate {
             sitzung: Sitzung {
+                id: Uuid::parse_str("efc794db-5d32-4186-a7d6-5fe6eee70452").unwrap(),
                 datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
                     .unwrap()
                     .and_hms_opt(7, 30, 15)
-                    .unwrap(),
-                sitzung_type: SitzungType::Normal,
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap()
+                    .into(),
+                kind: SitzungKind::Normal,
+                tops: vec![],
             },
             raete: vec![
-                Rat {
+                PersonWithAbmeldung {
                     name: "Valentin".to_string(),
                     abgemeldet: false,
                 },
-                Rat {
+                PersonWithAbmeldung {
                     name: "Jonas \"Kooptimus\"".to_string(),
                     abgemeldet: false,
                 },
-                Rat {
+                PersonWithAbmeldung {
                     name: "Marcel \"Markal\"".to_string(),
                     abgemeldet: false,
                 },
-                Rat {
+                PersonWithAbmeldung {
                     name: "Elif".to_string(),
                     abgemeldet: true,
                 },
-                Rat {
+                PersonWithAbmeldung {
                     name: "Australian".to_string(),
                     abgemeldet: true,
                 },
             ],
             events: vec![],
-            tops: vec![],
         };
 
         assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_RÄTE);
-    }
-
-    // #[test]
-    // randomly breaks because of timezone issues.. bad test
-    fn render_with_events() {
-        let template = ProtokollTemplate {
-            sitzung: Sitzung {
-                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
-                    .unwrap()
-                    .and_hms_opt(7, 30, 15)
-                    .unwrap(),
-                sitzung_type: SitzungType::Normal,
-            },
-            raete: vec![],
-            events: vec![
-                Event {
-                    title: Some("Spieleabend".to_string()),
-                    location: Some("33er".to_string()),
-                    start: Utc.with_ymd_and_hms(2042, 4, 5, 17, 00, 00).unwrap().into(),
-                },
-                Event {
-                    title: Some("Semestergrillen".to_string()),
-                    location: Some("Grillplätze bei der Mathe".to_string()),
-                    start: Utc
-                        .with_ymd_and_hms(2042, 4, 12, 17, 00, 00)
-                        .unwrap()
-                        .into(),
-                },
-            ],
-            tops: vec![],
-        };
-
-        assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_EVENTS);
     }
 
     #[test]
