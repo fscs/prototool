@@ -53,3 +53,5 @@ Options:
       --from-pad <PAD_URL>           Load the protokoll content from a hedgedoc note
   -h, --help                         Print help
 ```
+
+Man könnte es auch [protocool](https://www.youtube.com/watch?v=BxDmrzuPsYk) nennen :sunglasses:
