@@ -15,6 +15,9 @@ nix run github:fscs/prototool
 
 ## nicht nix
 
+Statische Binaries für Linux, MacOS und Windows gibts in den [Releases](https://github.com/fscs/prototool/releases/latest).
+
+Oder auch einfach:
 ```
 cargo install --git https://github.com/fscs/prototool
 ```
