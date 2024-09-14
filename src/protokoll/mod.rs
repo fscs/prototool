@@ -258,22 +258,27 @@ mod tests {
                 PersonWithAbmeldung {
                     name: "Valentin".to_string(),
                     abgemeldet: false,
+                    anwesend: true,
                 },
                 PersonWithAbmeldung {
                     name: "Jonas \"Kooptimus\"".to_string(),
                     abgemeldet: false,
+                    anwesend: false,
                 },
                 PersonWithAbmeldung {
                     name: "Marcel \"Markal\"".to_string(),
                     abgemeldet: false,
+                    anwesend: false,
                 },
                 PersonWithAbmeldung {
                     name: "Elif".to_string(),
                     abgemeldet: true,
+                    anwesend: false,
                 },
                 PersonWithAbmeldung {
                     name: "Australian".to_string(),
                     abgemeldet: true,
+                    anwesend: false,
                 },
             ],
             events: vec![],

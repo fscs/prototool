@@ -7,6 +7,7 @@ use arboard::Clipboard;
 
 #[cfg(target_os = "linux")]
 use arboard::SetExtLinux;
+use inquire::MultiSelect;
 #[cfg(target_os = "linux")]
 use libc::fork;
 #[cfg(target_os = "linux")]
@@ -18,7 +19,7 @@ use reqwest::blocking::Client;
 use url::Url;
 
 use super::Runnable;
-use prototool::protokoll::{self, events, person, sitzung, ProtokollTemplate};
+use prototool::protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate};
 
 use prototool::post;
 
@@ -54,6 +55,9 @@ pub struct GenerateCommand {
     /// Load the protokoll content from a hedgedoc note
     #[arg(long, value_name = "PAD_URL", alias = "fp")]
     pub from_pad: Option<Url>,
+    /// Dont Ask for Presence
+    #[arg(long)]
+    pub no_ask_presence: bool
 }
 
 impl Runnable for GenerateCommand {
@@ -98,7 +102,11 @@ impl GenerateCommand {
         println!("fetching räte and withdrawals...");
         let raete = person::fetch_raete(&self.endpoint_url, client)?;
         let abmeldungen = person::fetch_abmeldungen(&self.endpoint_url, client, &sitzung)?;
-        let raete_and_abmeldung = person::determine_present_räte(&raete, &abmeldungen);
+        let mut raete_and_abmeldung = person::determine_abgemeldet_räte(&raete, &abmeldungen);
+            
+        if !self.no_ask_presence {
+            self.ask_present_räte(&mut raete_and_abmeldung)?;
+        }
 
         println!("fetching events...");
         let events = events::fetch_calendar_events(&self.endpoint_url, client)?;
@@ -108,6 +116,19 @@ impl GenerateCommand {
             raete: raete_and_abmeldung,
             events,
         });
+    }
+
+    fn ask_present_räte(
+        &self,
+        räte: &mut [PersonWithAbmeldung],
+    ) -> Result<()> {
+        let selected = MultiSelect::new("select present räte:", räte.to_vec()).prompt()?;
+
+        for rat in räte {
+            rat.anwesend = selected.iter().any(|s| s.name == rat.name);
+        }
+
+        Ok(())
     }
 
     fn write_to_file(&self, timestamp: &NaiveDate, content: &str) -> Result<()> {

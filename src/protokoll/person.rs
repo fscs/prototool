@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use anyhow::{Context, Result};
 use reqwest::blocking::Client;
 use serde::Deserialize;
@@ -6,10 +8,17 @@ use uuid::Uuid;
 
 use super::Sitzung;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct PersonWithAbmeldung {
     pub name: String,
     pub abgemeldet: bool,
+    pub anwesend: bool,
+}
+
+impl Display for PersonWithAbmeldung {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name.as_str())
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -56,7 +65,7 @@ pub fn fetch_abmeldungen(
     Ok(abmeldungen)
 }
 
-pub fn determine_present_räte(
+pub fn determine_abgemeldet_räte(
     personen: &[Person],
     abmeldungen: &[Abmeldung],
 ) -> Vec<PersonWithAbmeldung> {
@@ -67,6 +76,7 @@ pub fn determine_present_räte(
 
             PersonWithAbmeldung {
                 name: p.name.to_owned(),
+                anwesend: false,
                 abgemeldet,
             }
         })
@@ -101,14 +111,16 @@ mod tests {
             PersonWithAbmeldung {
                 name: "Valentin Pukhov".to_string(),
                 abgemeldet: true,
+                anwesend: false,
             },
             PersonWithAbmeldung {
                 name: "Florian Schubert".to_string(),
                 abgemeldet: false,
+                anwesend: false,
             },
         ];
 
-        let actual = super::determine_present_räte(&persons, &abmeldungen);
+        let actual = super::determine_abgemeldet_räte(&persons, &abmeldungen);
 
         assert_eq!(expected, actual);
     }

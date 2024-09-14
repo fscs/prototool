@@ -10,10 +10,10 @@ hiddenUntil: "2022-05-31"
 
 #### Anwesende Rätys
 - Valentin
-- Jonas "Kooptimus"
-- Marcel "Markal"
 
 #### Abwesende Rätys
+- Jonas "Kooptimus"
+- Marcel "Markal"
 
 #### Entschuldigte Rätys
 - Elif
