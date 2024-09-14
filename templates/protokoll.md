@@ -10,16 +10,21 @@ hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 
 #### Anwesende Rätys
 {%~ for rat in raete -%}
-{%- if !rat.abgemeldet -%}
+{%- if rat.anwesend -%}
 - {{ rat.name }}
 {% endif -%}
 {%- endfor ~%}
 
 #### Abwesende Rätys
+{%~ for rat in raete -%}
+{%- if !rat.anwesend && !rat.abgemeldet -%}
+- {{ rat.name }}
+{% endif -%}
+{%- endfor ~%}
 
 #### Entschuldigte Rätys
 {%~ for rat in raete -%}
-{%- if rat.abgemeldet -%}
+{%- if rat.abgemeldet && !rat.anwesend -%}
 - {{ rat.name }}
 {% endif -%}
 {%- endfor ~%}
