@@ -1,8 +1,9 @@
 use anyhow::{Context, Result};
 use clap::Args;
 
-use super::Runnable;
 use prototool::post;
+
+use super::Runnable;
 
 /// Create a new post.
 #[derive(Debug, Args)]

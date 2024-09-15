@@ -1,27 +1,26 @@
 use std::fs::OpenOptions;
 
 use anyhow::{anyhow, Context, Result};
-use askama::Template;
-
 use arboard::Clipboard;
+use askama::Template;
+use chrono::{DateTime, Local, NaiveDate, NaiveTime};
+use clap::{ArgGroup, Args};
+use inquire::MultiSelect;
+use reqwest::blocking::Client;
+use url::Url;
 
 #[cfg(target_os = "linux")]
 use arboard::SetExtLinux;
-use inquire::MultiSelect;
 #[cfg(target_os = "linux")]
 use libc::fork;
 #[cfg(target_os = "linux")]
 use rustix::stdio::{dup2_stdin, dup2_stdout};
 
-use chrono::{DateTime, Local, NaiveDate, NaiveTime};
-use clap::{ArgGroup, Args};
-use reqwest::blocking::Client;
-use url::Url;
-
 use super::Runnable;
-use prototool::protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate};
-
-use prototool::post;
+use prototool::{
+    post,
+    protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate},
+};
 
 /// Generate a new Protokoll
 #[derive(Debug, Args)]
@@ -57,7 +56,7 @@ pub struct GenerateCommand {
     pub from_pad: Option<Url>,
     /// Dont Ask for Presence
     #[arg(long)]
-    pub no_ask_presence: bool
+    pub no_ask_presence: bool,
 }
 
 impl Runnable for GenerateCommand {
@@ -103,7 +102,7 @@ impl GenerateCommand {
         let raete = person::fetch_raete(&self.endpoint_url, client)?;
         let abmeldungen = person::fetch_abmeldungen(&self.endpoint_url, client, &sitzung)?;
         let mut raete_and_abmeldung = person::determine_abgemeldet_räte(&raete, &abmeldungen);
-            
+
         if !self.no_ask_presence {
             self.ask_present_räte(&mut raete_and_abmeldung)?;
         }
@@ -118,10 +117,7 @@ impl GenerateCommand {
         });
     }
 
-    fn ask_present_räte(
-        &self,
-        räte: &mut [PersonWithAbmeldung],
-    ) -> Result<()> {
+    fn ask_present_räte(&self, räte: &mut [PersonWithAbmeldung]) -> Result<()> {
         let selected = MultiSelect::new("select present räte:", räte.to_vec()).prompt()?;
 
         for rat in räte {

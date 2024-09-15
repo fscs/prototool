@@ -1,9 +1,9 @@
+use std::fs;
+use std::path::{Path, PathBuf};
+
 use anyhow::{bail, Context, Result};
 use askama::Template;
 use chrono::NaiveDateTime;
-
-use std::fs;
-use std::path::{Path, PathBuf};
 
 #[derive(Template)]
 #[template(path = "../templates/post.md")]
