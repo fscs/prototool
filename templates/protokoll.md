@@ -47,7 +47,7 @@ hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
 - Wir sind mit n Studierenden vorläufig beschlussfähig
 - Wir nehmen das Protokoll der letzten VV einstimmig an
 {% else -%}
-- Wir sind mit n von {{ raete.len() }} Rätys beschlussfähig
+- Wir sind mit {{ raete|anwesende_raete_label }} von {{ raete.len() }} Rätys beschlussfähig
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 {% endif -%}
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
@@ -76,7 +76,7 @@ _Top endet um T Uhr._
 
 ```vote-success
 {{antrag.antragstext}}  
-Abstimmung: n Zustimmen, n Gegenstimmen, n Enthaltungen  
+Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen  
 ```
 {% endfor ~%}
 

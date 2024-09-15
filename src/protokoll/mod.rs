@@ -58,7 +58,7 @@ pub struct ProtokollTemplate {
 mod filters {
     use chrono::{DateTime, Days, Local, NaiveDate};
 
-    use super::{Event, Sitzung, SitzungKind, Top, TopKind};
+    use super::{Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops.iter().filter(|e| e.kind == TopKind::Normal).collect();
@@ -104,6 +104,17 @@ mod filters {
         let result = format!("{} vom {}", prefix, sitzung.datetime.format("%d.%m.%Y"));
 
         Ok(result)
+    }
+
+    pub fn anwesende_raete_label(raete: &[PersonWithAbmeldung]) -> askama::Result<String> {
+        let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
+
+        if anwesend_count == 0 {
+            Ok("n".to_string()) // i mean at least one has got to be the person writing the
+                                // protocoll
+        } else {
+            Ok(anwesend_count.to_string())
+        }
     }
 }
 

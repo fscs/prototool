@@ -29,7 +29,7 @@ hiddenUntil: "2022-05-31"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 5 Rätys beschlussfähig
+- Wir sind mit 1 von 5 Rätys beschlussfähig
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
