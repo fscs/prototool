@@ -1,18 +1,14 @@
 {
-  description = "";
+  description = "Tool zum automatischen generieren von Protokollen und Website Posts";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
 
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-analyzer-src.follows = "";
     };
 
     flake-utils.url = "github:numtide/flake-utils";
@@ -31,7 +27,7 @@
 
       inherit (pkgs) lib;
 
-      craneLib = crane.lib.${system};
+      craneLib = crane.mkLib pkgs;
 
       markdownFilter = path: _type: builtins.match ".*md$" path != null;
       markdownOrCargo = path: type:
