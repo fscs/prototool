@@ -24,12 +24,14 @@ serde = { version = "1", features = ["derive"] }
 url = "2.5"
 uuid = { version = "1.8", features = ["v4", "serde"] }
 arboard = {version = "3.4", features = ["windows-sys", "wayland-data-control"], default-features = false }
-libc = "0.2"
-rustix = { version = "0.38", features = ["stdio"], default-features = false  }
 markdown = "=1.0.0-alpha.20"
 serde_yaml = "0.9.34"
 toml = { version = "0.8.19", features = ["parse"], default-features = false }
 inquire = { version = "0.7.5", default-features = false, features = ["crossterm"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+rustix = { version = "0.38", features = ["stdio"], default-features = false  }
 
 [dev-dependencies]
 pretty_assertions = "1.4"
