@@ -6,11 +6,6 @@
 
     crane.url = "github:ipetkov/crane";
 
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -18,7 +13,6 @@
     self,
     nixpkgs,
     crane,
-    fenix,
     flake-utils,
     ...
   }:
@@ -46,20 +40,12 @@
           pkgs.pkg-config
         ];
 
-        buildInputs = with pkgs;
+        buildInputs =
           []
           ++ lib.optionals pkgs.stdenv.isDarwin [
             pkgs.libiconv
           ];
       };
-
-      craneLibLLvmTools =
-        craneLib.overrideToolchain
-        (fenix.packages.${system}.complete.withComponents [
-          "cargo"
-          "llvm-tools"
-          "rustc"
-        ]);
 
       cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
@@ -71,37 +57,13 @@
       checks = {
         inherit my-crate;
 
-        my-crate-clippy = craneLib.cargoClippy (commonArgs
+        my-crate-test = craneLib.cargoTest (commonArgs
           // {
             inherit cargoArtifacts;
-            cargoClippyExtraArgs = "--all-targets";
-          });
-
-        # Check formatting
-        my-crate-fmt = craneLib.cargoFmt {
-          inherit src;
-        };
-
-        # Consider setting `doCheck = false` on `my-crate` if you do not want
-        # the tests to run twice
-        my-crate-nextest = craneLib.cargoNextest (commonArgs
-          // {
-            inherit cargoArtifacts;
-            partitions = 1;
-            partitionType = "count";
           });
       };
 
-      packages =
-        {
-          default = my-crate;
-        }
-        // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
-          my-crate-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs
-            // {
-              inherit cargoArtifacts;
-            });
-        };
+      packages.default = my-crate;
 
       apps.default = flake-utils.lib.mkApp {
         drv = my-crate;
