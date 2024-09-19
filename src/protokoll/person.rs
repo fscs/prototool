@@ -39,6 +39,8 @@ pub fn fetch_raete(api_url: &Url, client: &Client) -> Result<Vec<Person>> {
     let response = client
         .get(endpoint)
         .send()
+        .context("unable to fetch räte")?
+        .error_for_status()
         .context("unable to fetch räte")?;
 
     let persons = response.json().context("unable to deserialize räte")?;
@@ -56,6 +58,8 @@ pub fn fetch_abmeldungen(
     let response = client
         .get(endpoint)
         .send()
+        .context("unable to fetch abmeldungen")?
+        .error_for_status()
         .context("unable to fetch abmeldungen")?;
 
     let abmeldungen = response

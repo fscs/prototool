@@ -18,9 +18,13 @@ pub fn fetch_calendar_events(api_url: &Url, client: &Client) -> Result<Vec<Event
     let response = client
         .get(endpoint)
         .send()
-        .context("unable to fetch current tops")?;
+        .context("unable to fetch events")?
+        .error_for_status()
+        .context("unable to fetch events")?;
 
-    let events = response.json().context("failed to deserialize events")?;
+    let events = response
+        .json()
+        .context(format!("failed to deserialize events",))?;
 
     Ok(events)
 }

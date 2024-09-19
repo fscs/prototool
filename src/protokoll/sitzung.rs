@@ -64,6 +64,8 @@ pub fn fetch_sitzung(api_url: &Url, client: &Client, datetime: DateTime<Local>) 
     let response = client
         .get(endpoint)
         .send()
+        .context("unable to fetch next sitzung")?
+        .error_for_status()
         .context("unable to fetch next sitzung")?;
 
     let sitzung = response.json().context("failed to deserialize sitzung")?;
