@@ -1,7 +1,7 @@
 [package]
 name = "prototool"
 description = "Tool zum automatischen generieren von Protokollen und Website Posts"
-version = "2.2.0"
+version = "2.3.0"
 edition = "2021"
 
 [lib]
@@ -14,25 +14,25 @@ path = "src/cli/prototool.rs"
 
 [dependencies]
 anyhow = "1"
-askama = "0.12"
-chrono = { version = "0.4", features = ["serde"] }
+askama = "0"
+chrono = { version = "0", features = ["serde"] }
 clap = { version = "4", features = ["derive", "env"] }
-opener = "0.7"
-reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls", "http2", "macos-system-configuration", "charset"], default-features = false }
+opener = "0"
+reqwest = { version = "0", features = ["blocking", "json", "rustls-tls", "http2", "macos-system-configuration", "charset"], default-features = false }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
-url = "2.5"
-uuid = { version = "1.8", features = ["v4", "serde"] }
-arboard = {version = "3.4", features = ["windows-sys", "wayland-data-control"], default-features = false }
+url = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+arboard = {version = "3", features = ["windows-sys", "wayland-data-control"], default-features = false }
 markdown = "=1.0.0-alpha.20"
-serde_yaml = "0.9.34"
-toml = { version = "0.8.19", features = ["parse"], default-features = false }
-inquire = { version = "0.7.5", default-features = false, features = ["crossterm"] }
+serde_yaml = "0"
+toml = { version = "0", features = ["parse"], default-features = false }
+inquire = { version = "0", default-features = false, features = ["crossterm"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-libc = "0.2"
-rustix = { version = "0.38", features = ["stdio"], default-features = false  }
+libc = "0"
+rustix = { version = "0", features = ["stdio"], default-features = false  }
 
 [dev-dependencies]
-pretty_assertions = "1.4"
+pretty_assertions = "1"
 tempfile = "3"
