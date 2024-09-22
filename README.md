@@ -7,8 +7,6 @@ Keinen Bock mehr Tops aus dem Discord zu copy pasten? Du verlierst immer den Lin
 
 ## nix
 
-Ganz normal als flake installieren oder einfach
-
 ```
 nix run github:fscs/prototool
 ```
@@ -17,7 +15,8 @@ nix run github:fscs/prototool
 
 Statische Binaries für Linux, MacOS und Windows gibts in den [Releases](https://github.com/fscs/prototool/releases/latest).
 
-Oder auch einfach:
+Oder auch einfach mit [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html):
+
 ```
 cargo install --git https://github.com/fscs/prototool
 ```
