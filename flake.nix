@@ -52,6 +52,8 @@
       my-crate = craneLib.buildPackage (commonArgs
         // {
           inherit cargoArtifacts;
+          
+          meta.mainProgram = "prototool";
         });
     in {
       checks = {
