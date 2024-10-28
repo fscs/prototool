@@ -1,5 +1,6 @@
-use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::{env, fs};
 
 use anyhow::{bail, Context, Result};
 use askama::Template;
@@ -50,7 +51,17 @@ pub fn create_post(
 }
 
 pub fn edit(path: &Path) -> Result<()> {
-    opener::open(path).context("unable to open file")
+    if let Ok(editor) = env::var("EDITOR") {
+        Command::new(editor.as_str())
+            .arg(path)
+            .spawn()
+            .context("unable to spawn editor process")?
+            .wait()?;
+
+        Ok(())
+    } else {
+        opener::open(path).context("unable to open file")
+    }
 }
 
 pub fn render_post_template(date: &NaiveDateTime) -> Result<String> {
