@@ -73,6 +73,11 @@
 
       devShells.default = craneLib.devShell {
         checks = self.checks.${system};
+        nativeBuildInputs = with pkgs; [
+          cargo 
+          rustc
+          rustfmt
+        ];
       };
     });
 }
