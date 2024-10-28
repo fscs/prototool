@@ -1,7 +1,7 @@
 [package]
 name = "prototool"
 description = "Tool zum automatischen generieren von Protokollen und Website Posts"
-version = "2.3.0"
+version = "2.4.0"
 edition = "2021"
 
 [lib]
@@ -24,7 +24,7 @@ serde = { version = "1", features = ["derive"] }
 url = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
 arboard = {version = "3", features = ["windows-sys", "wayland-data-control"], default-features = false }
-markdown = "=1.0.0-alpha.20"
+markdown = "=1.0.0-alpha.21"
 serde_yaml = "0"
 toml = { version = "0", features = ["parse"], default-features = false }
 inquire = { version = "0", default-features = false, features = ["crossterm"] }
