@@ -52,6 +52,7 @@ pub struct Top {
     pub name: String,
     pub anträge: Vec<Antrag>,
     pub kind: TopKind,
+    pub inhalt: String
 }
 
 pub fn fetch_sitzung(api_url: &Url, client: &Client, datetime: DateTime<Local>) -> Result<Sitzung> {

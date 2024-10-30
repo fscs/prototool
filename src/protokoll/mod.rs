@@ -71,15 +71,6 @@ mod filters {
         Ok(result)
     }
 
-    pub fn verschiedenes_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
-        let result = tops
-            .iter()
-            .filter(|e| e.kind == TopKind::Verschiedenes)
-            .collect();
-
-        Ok(result)
-    }
-
     pub fn hidden_until_date(datetime: &DateTime<Local>) -> askama::Result<NaiveDate> {
         let date = datetime.date_naive();
         let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
@@ -212,6 +203,7 @@ mod tests {
                         name: "Blumen für Valentin".to_string(),
                         weight: 1,
                         kind: TopKind::Normal,
+                        inhalt: "ich weiß aber nicht wo der nächste blumenladen ist".to_string(),
                         anträge: vec![Antrag {
                             titel: "Blumen für Valentin".to_string(),
                             antragstext: "Die Fachschaft Informatik beschließt".to_string(),
@@ -219,20 +211,10 @@ mod tests {
                         }],
                     },
                     Top {
-                        name: "Voltpfand".to_string(),
-                        weight: 1,
-                        kind: TopKind::Verschiedenes,
-                        anträge: vec![Antrag {
-                            titel: "Voltpfand".to_string(),
-                            antragstext: "aint nobody got time for that".to_string(),
-                            begründung: "Der Voltpfand muss dringend weggebracht werden."
-                                .to_string(),
-                        }],
-                    },
-                    Top {
                         name: "Volt Zapfanlage".to_string(),
                         weight: 2,
                         kind: TopKind::Normal,
+                        inhalt: "volt volt volt".to_string(),
                         anträge: vec![
                             Antrag {
                                 titel: "Tank für Voltzapfanlage".to_string(),

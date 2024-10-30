@@ -42,6 +42,11 @@ sitzung-kind: "normal"
 _Top endet um T Uhr._
 
 ## Top 2: Blumen für Valentin
+
+ich weiß aber nicht wo der nächste blumenladen ist
+
+### Antrag: Blumen für Valentin
+
 Weil wir Valentin toll finden
 
 ```vote-success
@@ -53,7 +58,10 @@ _Top endet um T Uhr._
 
 ## Top 3: Volt Zapfanlage
 
+volt volt volt
+
 ### Antrag: Tank für Voltzapfanlage
+
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
@@ -62,6 +70,7 @@ Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen
 ```
 
 ### Antrag: Hahn für Voltzapfanlage
+
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
@@ -76,8 +85,5 @@ _Top endet um T Uhr._
 ### Anstehende Veranstaltungen
 
 ### Sonstiges
-
-#### Voltpfand
-Der Voltpfand muss dringend weggebracht werden.
 
 _Top endet um T Uhr._

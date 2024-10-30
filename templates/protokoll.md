@@ -67,12 +67,12 @@ _Top endet um T Uhr._
 {% for top in sitzung.tops|normal_tops %}
 ## Top {{ loop.index0 + 2 }}: {{top.name}}
 
-{%~ for antrag in top.anträge -%}
+{{top.inhalt}}
 
-{%~ if top.anträge.len() > 1 ~%}
+{%~ for antrag in top.anträge ~%}
+
 ### Antrag: {{ antrag.titel }}
-{%~ endif -%}
-  
+
 {{ antrag.begründung }}
 
 ```vote-success
@@ -92,14 +92,6 @@ _Top endet um T Uhr._
 {%- endfor %}
 
 ### Sonstiges
-{% for top in sitzung.tops|verschiedenes_tops -%}
-{%~ for antrag in top.anträge ~%}
-
-#### {{ antrag.titel }}
-{{ antrag.begründung }}
-
-{%- endfor ~%}
-{%~ endfor ~%}
 
 _Top endet um T Uhr._
 
