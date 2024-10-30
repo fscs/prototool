@@ -50,7 +50,8 @@ ich weiß aber nicht wo der nächste blumenladen ist
 Weil wir Valentin toll finden
 
 ```vote-success
-Die Fachschaft Informatik beschließt  
+Die Fachschaft Informatik beschließt
+
 Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen  
 ```
 
@@ -65,7 +66,8 @@ volt volt volt
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
-Die Fachschaft Informatik beschließt  
+Die Fachschaft Informatik beschließt
+
 Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen  
 ```
 
@@ -74,7 +76,8 @@ Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen
 Volt aus dem Hahn > Volt aus der Dose
 
 ```vote-success
-Die Fachschaft Informatik beschließt  
+Die Fachschaft Informatik beschließt
+
 Abstimmung: n Zustimmen, m Gegenstimmen, k Enthaltungen  
 ```
 
