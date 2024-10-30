@@ -112,6 +112,35 @@ mod filters {
             Ok(anwesend_count.to_string())
         }
     }
+
+    pub fn beschlussfaehig_label(raete: &[PersonWithAbmeldung]) -> askama::Result<String> {
+        let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
+
+        if anwesend_count == 0 || raete.len() == 0 {
+            return Ok("vielleicht beschlussfähig".to_string());
+        }
+
+        let percent: f64 = anwesend_count as f64 / raete.len() as f64;
+
+        if percent > 0.5  {
+            Ok("beschlussfähig".to_string())
+        } else {
+            Ok("nicht beschlussfähig".to_string())
+        }
+        
+    }
+    
+    pub fn beschlussfaehig(raete: &[PersonWithAbmeldung]) -> askama::Result<bool> {
+        let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
+
+        if anwesend_count == 0 {
+            return Ok(true);
+        }
+
+        let percent: f64 = anwesend_count as f64 / raete.len() as f64;
+
+        return Ok(percent > 0.5);
+    }
 }
 
 #[cfg(test)]
@@ -132,6 +161,7 @@ mod tests {
     static PROTOKOLL_VV: &str = include_str!("../../tests/protokoll-vv.md");
     static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
+    static PROTOKOLL_WITH_RÄTE_NO_BESCHLUSS: &str = include_str!("../../tests/protokoll-with-rate-no-beschluss.md");
 
     // im quite sure we still fuck up the timezone faking and im not sure if we can actually do
     // anything about it when using DateTime<Local>. ATM this isnt a problem tho because we dont
@@ -261,6 +291,54 @@ mod tests {
                 PersonWithAbmeldung {
                     name: "Jonas \"Kooptimus\"".to_string(),
                     abgemeldet: false,
+                    anwesend: true,
+                },
+                PersonWithAbmeldung {
+                    name: "Marcel \"Markal\"".to_string(),
+                    abgemeldet: false,
+                    anwesend: true,
+                },
+                PersonWithAbmeldung {
+                    name: "Elif".to_string(),
+                    abgemeldet: true,
+                    anwesend: false,
+                },
+                PersonWithAbmeldung {
+                    name: "Australian".to_string(),
+                    abgemeldet: true,
+                    anwesend: false,
+                },
+            ],
+            events: vec![],
+        };
+
+        assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_RÄTE);
+    }
+
+    #[test]
+    fn render_with_räte_no_beschluss() {
+        let template = ProtokollTemplate {
+            sitzung: Sitzung {
+                id: Uuid::parse_str("efc794db-5d32-4186-a7d6-5fe6eee70452").unwrap(),
+                datetime: NaiveDate::from_ymd_opt(2022, 5, 27)
+                    .unwrap()
+                    .and_hms_opt(7, 30, 15)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap()
+                    .into(),
+                kind: SitzungKind::Normal,
+                tops: vec![],
+            },
+            raete: vec![
+                PersonWithAbmeldung {
+                    name: "Valentin".to_string(),
+                    abgemeldet: false,
+                    anwesend: true,
+                },
+                PersonWithAbmeldung {
+                    name: "Jonas \"Kooptimus\"".to_string(),
+                    abgemeldet: false,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
@@ -282,7 +360,7 @@ mod tests {
             events: vec![],
         };
 
-        assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_RÄTE);
+        assert_eq!(template.render().unwrap(), PROTOKOLL_WITH_RÄTE_NO_BESCHLUSS);
     }
 
     #[test]

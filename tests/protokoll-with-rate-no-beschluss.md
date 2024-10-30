@@ -10,10 +10,15 @@ sitzung-kind: "normal"
 <summary>Anwesenheitsliste</summary>
 
 #### Anwesende Rätys
+- Valentin
 
 #### Abwesende Rätys
+- Jonas "Kooptimus"
+- Marcel "Markal"
 
 #### Entschuldigte Rätys
+- Elif
+- Australian
 
 #### Gäste
 
@@ -25,8 +30,9 @@ sitzung-kind: "normal"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 0 Rätys vielleicht beschlussfähig
-- Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+- Wir sind mit 1 von 5 Rätys nicht beschlussfähig
+- Es wird eine Ersatzsitzung gehalten, D um T Uhr
+- Wir können aufgrund der fehlenden Beschlussfähigkeit das Protokoll nicht annehmen
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
 ## Top 1: Berichte, Mail und Post

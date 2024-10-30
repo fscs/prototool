@@ -48,8 +48,13 @@ sitzung-kind: "{{ sitzung.kind}}"
 - Wir sind mit n Studierenden vorläufig beschlussfähig
 - Wir nehmen das Protokoll der letzten VV einstimmig an
 {% else -%}
-- Wir sind mit {{ raete|anwesende_raete_label }} von {{ raete.len() }} Rätys beschlussfähig
+- Wir sind mit {{ raete|anwesende_raete_label }} von {{ raete.len() }} Rätys {{ raete|beschlussfaehig_label }}
+{%~ if raete|beschlussfaehig -%}
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
+{% else -%}
+- Es wird eine Ersatzsitzung gehalten, D um T Uhr
+- Wir können aufgrund der fehlenden Beschlussfähigkeit das Protokoll nicht annehmen
+{% endif -%}
 {% endif -%}
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 

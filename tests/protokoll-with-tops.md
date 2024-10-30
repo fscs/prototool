@@ -25,7 +25,7 @@ sitzung-kind: "normal"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit n von 0 Rätys beschlussfähig
+- Wir sind mit n von 0 Rätys vielleicht beschlussfähig
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 

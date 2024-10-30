@@ -11,10 +11,10 @@ sitzung-kind: "normal"
 
 #### Anwesende Rätys
 - Valentin
-
-#### Abwesende Rätys
 - Jonas "Kooptimus"
 - Marcel "Markal"
+
+#### Abwesende Rätys
 
 #### Entschuldigte Rätys
 - Elif
@@ -30,7 +30,7 @@ sitzung-kind: "normal"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: 
-- Wir sind mit 1 von 5 Rätys beschlussfähig
+- Wir sind mit 3 von 5 Rätys beschlussfähig
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
