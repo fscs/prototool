@@ -5,14 +5,20 @@ use serde::Deserialize;
 use url::Url;
 use uuid::Uuid;
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, strum::Display)]
 #[serde(rename_all = "lowercase")]
 pub enum SitzungKind {
+    #[strum(to_string = "normal")]
     Normal,
+    #[strum(to_string = "vv")]
     VV,
+    #[strum(to_string = "wahlvv")]
     WahlVV,
+    #[strum(to_string = "ersatz")]
     Ersatz,
+    #[strum(to_string = "konsti")]
     Konsti,
+    #[strum(to_string = "dringlichkeit")]
     Dringlichkeit,
 }
 

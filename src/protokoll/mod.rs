@@ -12,16 +12,15 @@ pub use events::Event;
 pub use person::{Abmeldung, Person, PersonWithAbmeldung};
 pub use sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind};
 
-// helper struct for finding a protokolls creation date
 #[derive(Deserialize)]
-struct DateOrLastmod {
-    date: Option<NaiveDate>,
-    lastmod: Option<NaiveDate>,
+#[serde(rename_all = "kebab-case")]
+pub struct ProtokollFrontmatter {
+    pub date: Option<NaiveDate>,
+    pub lastmod: Option<NaiveDate>,
+    pub sitzung_kind: Option<SitzungKind>,
 }
 
-/// finds the creation date of this protokoll by searching the frontmatter for
-/// the keys 'date' or 'lastmod'
-pub fn find_protokoll_date(protokoll: &mdast::Node) -> Result<NaiveDate> {
+pub fn find_frontmatter(protokoll: &mdast::Node) -> Result<ProtokollFrontmatter> {
     let Some(children) = protokoll.children() else {
         bail!("document is empty");
     };
@@ -31,15 +30,21 @@ pub fn find_protokoll_date(protokoll: &mdast::Node) -> Result<NaiveDate> {
         .find(|e| matches!(e, mdast::Node::Toml(_) | mdast::Node::Yaml(_)))
         .ok_or_else(|| anyhow!("no frontmatter found"))?;
 
-    let date_or_lastmod: DateOrLastmod = match frontmatter {
+    let result: ProtokollFrontmatter = match frontmatter {
         mdast::Node::Toml(toml) => toml::from_str(toml.value.as_str())?,
         mdast::Node::Yaml(yaml) => serde_yaml::from_str(yaml.value.as_str())?,
         _ => unreachable!(),
     };
 
-    if let Some(date) = date_or_lastmod.date {
+    Ok(result)
+}
+
+/// finds the creation date of this protokoll by searching the frontmatter for
+/// the keys 'date' or 'lastmod'
+pub fn find_protokoll_date(frontmatter: &ProtokollFrontmatter) -> Result<NaiveDate> {
+    if let Some(date) = frontmatter.date {
         return Ok(date);
-    } else if let Some(lastmod) = date_or_lastmod.lastmod {
+    } else if let Some(lastmod) = frontmatter.lastmod {
         return Ok(lastmod);
     } else {
         bail!("neither 'date' or 'lastmod' set in frontmatter")
@@ -315,8 +320,9 @@ date: "2022-05-27"
         };
 
         let mdast = markdown::to_mdast(protokoll, &markdown_opts).unwrap();
+        let frontmatter = super::find_frontmatter(&mdast).unwrap();
 
-        let timestamp = super::find_protokoll_date(&mdast).unwrap();
+        let timestamp = super::find_protokoll_date(&frontmatter).unwrap();
 
         let expected = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
 
@@ -340,8 +346,9 @@ lastmod: "2022-05-27"
         };
 
         let mdast = markdown::to_mdast(protokoll, &markdown_opts).unwrap();
+        let frontmatter = super::find_frontmatter(&mdast).unwrap();
 
-        let timestamp = super::find_protokoll_date(&mdast).unwrap();
+        let timestamp = super::find_protokoll_date(&frontmatter).unwrap();
 
         let expected = NaiveDate::from_ymd_opt(2022, 5, 27).unwrap();
 

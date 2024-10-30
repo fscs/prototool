@@ -3,6 +3,7 @@ title: "Protokoll vom 27.05.2022"
 date: "2022-05-27"
 draft: true
 hiddenUntil: "2022-05-31"
+sitzung-kind: "normal"
 ---
 
 <details>

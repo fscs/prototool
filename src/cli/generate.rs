@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use anyhow::{anyhow, Context, Result};
 use arboard::Clipboard;
 use askama::Template;
-use chrono::{DateTime, Local, NaiveDate, NaiveTime};
+use chrono::{DateTime, Local, NaiveTime};
 use clap::{ArgGroup, Args};
 use inquire::MultiSelect;
 use reqwest::blocking::Client;
@@ -19,7 +19,7 @@ use rustix::stdio::{dup2_stdin, dup2_stdout};
 use super::Runnable;
 use prototool::{
     post,
-    protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate},
+    protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate, SitzungKind},
 };
 
 /// Generate a new Protokoll
@@ -127,12 +127,38 @@ impl GenerateCommand {
         Ok(())
     }
 
-    fn write_to_file(&self, timestamp: &NaiveDate, content: &str) -> Result<()> {
+    fn write_to_file(&self, content: &str) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
+        
+        let markdown_opts = markdown::ParseOptions {
+            constructs: markdown::Constructs {
+                frontmatter: true,
+                ..markdown::Constructs::gfm()
+            },
+            ..markdown::ParseOptions::default()
+        };
+
+        let mdast = markdown::to_mdast(content, &markdown_opts)
+            .map_err(|_| anyhow!("unable to parse pad contents"))?;
+
+        let frontmatter = protokoll::find_frontmatter(&mdast).unwrap();
+
+        let timestamp =
+            protokoll::find_protokoll_date(&frontmatter).context("unable to determine protokoll date")?;
+
+        let sitzung_kind = frontmatter.sitzung_kind.unwrap_or(SitzungKind::Normal);
+
+        let prefix = match sitzung_kind {
+            SitzungKind::Normal | SitzungKind::Ersatz | SitzungKind::Dringlichkeit => "",
+            SitzungKind::VV | SitzungKind::WahlVV => "vv-",
+            sitzung::SitzungKind::Konsti => "konsti-",
+        };
+        
         let path = format!(
-            "protokolle/{}/{}-protokoll.md",
+            "protokolle/{}/{}-{}protokoll.md",
             timestamp.format("%Y"),
             timestamp.format("%m-%d"),
+            prefix,
         );
 
         let file_path = post::create_post(content, &cwd, &self.lang, &path, self.force)?;
@@ -151,7 +177,7 @@ impl GenerateCommand {
             .render()
             .context("error while rendering template")?;
 
-        self.write_to_file(&template.sitzung.datetime.date_naive(), rendered.as_str())
+        self.write_to_file(rendered.as_str())
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -222,21 +248,7 @@ impl GenerateCommand {
 
         let content = clipboard.get_text().context("unable to read clipboard")?;
 
-        let markdown_opts = markdown::ParseOptions {
-            constructs: markdown::Constructs {
-                frontmatter: true,
-                ..markdown::Constructs::gfm()
-            },
-            ..markdown::ParseOptions::default()
-        };
-
-        let mdast = markdown::to_mdast(content.as_str(), &markdown_opts)
-            .map_err(|_| anyhow!("unable to parse pad contents"))?;
-
-        let timestamp =
-            protokoll::find_protokoll_date(&mdast).context("unable to determine protokoll date")?;
-
-        self.write_to_file(&timestamp, content.as_str())
+        self.write_to_file(content.as_str())
     }
 
     fn create_from_pad(&self, client: &Client, pad_url: &Url) -> Result<()> {
@@ -257,20 +269,6 @@ impl GenerateCommand {
             .text()
             .context("unable to determine content from response")?;
 
-        let markdown_opts = markdown::ParseOptions {
-            constructs: markdown::Constructs {
-                frontmatter: true,
-                ..markdown::Constructs::gfm()
-            },
-            ..markdown::ParseOptions::default()
-        };
-
-        let mdast = markdown::to_mdast(content.as_str(), &markdown_opts)
-            .map_err(|_| anyhow!("unable to parse pad contents"))?;
-
-        let timestamp =
-            protokoll::find_protokoll_date(&mdast).context("unable to determine protokoll date")?;
-
-        self.write_to_file(&timestamp, content.as_str())
+        self.write_to_file(content.as_str())
     }
 }

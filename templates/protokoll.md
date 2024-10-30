@@ -3,6 +3,7 @@ title: "{{ sitzung|protokoll_title }}"
 date: "{{ sitzung.datetime.format("%Y-%m-%d") }}"
 draft: true
 hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
+sitzung-kind: "{{ sitzung.kind}}"
 ---
 
 <details>
