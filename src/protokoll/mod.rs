@@ -122,14 +122,13 @@ mod filters {
 
         let percent: f64 = anwesend_count as f64 / raete.len() as f64;
 
-        if percent > 0.5  {
+        if percent > 0.5 {
             Ok("beschlussfähig".to_string())
         } else {
             Ok("nicht beschlussfähig".to_string())
         }
-        
     }
-    
+
     pub fn beschlussfaehig(raete: &[PersonWithAbmeldung]) -> askama::Result<bool> {
         let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
 
@@ -161,7 +160,8 @@ mod tests {
     static PROTOKOLL_VV: &str = include_str!("../../tests/protokoll-vv.md");
     static PROTOKOLL_WITH_TOPS: &str = include_str!("../../tests/protokoll-with-tops.md");
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
-    static PROTOKOLL_WITH_RÄTE_NO_BESCHLUSS: &str = include_str!("../../tests/protokoll-with-rate-no-beschluss.md");
+    static PROTOKOLL_WITH_RÄTE_NO_BESCHLUSS: &str =
+        include_str!("../../tests/protokoll-with-rate-no-beschluss.md");
 
     // im quite sure we still fuck up the timezone faking and im not sure if we can actually do
     // anything about it when using DateTime<Local>. ATM this isnt a problem tho because we dont
@@ -284,27 +284,37 @@ mod tests {
             },
             raete: vec![
                 PersonWithAbmeldung {
-                    name: "Valentin".to_string(),
+                    id: Uuid::parse_str("22b6b758-741c-429f-9e96-65fc289fcfef").unwrap(),
+                    first_name: "Valentin".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
-                    name: "Jonas \"Kooptimus\"".to_string(),
+                    id: Uuid::parse_str("f4e53c93-fc62-4977-a559-cb4d375f0c0e").unwrap(),
+                    first_name: "Jonas \"Kooptimus\"".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
-                    name: "Marcel \"Markal\"".to_string(),
+                    id: Uuid::parse_str("b3f8d4b2-69c0-420c-b606-187d5aac0401").unwrap(),
+                    first_name: "Marcel \"Markal\"".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
-                    name: "Elif".to_string(),
+                    id: Uuid::parse_str("8296be5b-4d66-4dc7-bec9-48ea851056cb").unwrap(),
+                    first_name: "Elif".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
-                    name: "Australian".to_string(),
+                    id: Uuid::parse_str("c82cdc91-9152-4201-a229-b2248ab4dcd2").unwrap(),
+                    first_name: "Australian".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
@@ -332,27 +342,37 @@ mod tests {
             },
             raete: vec![
                 PersonWithAbmeldung {
-                    name: "Valentin".to_string(),
+                    id: Uuid::parse_str("22b6b758-741c-429f-9e96-65fc289fcfef").unwrap(),
+                    first_name: "Valentin".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
-                    name: "Jonas \"Kooptimus\"".to_string(),
+                    id: Uuid::parse_str("f4e53c93-fc62-4977-a559-cb4d375f0c0e").unwrap(),
+                    first_name: "Jonas \"Kooptimus\"".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
-                    name: "Marcel \"Markal\"".to_string(),
+                    id: Uuid::parse_str("b3f8d4b2-69c0-420c-b606-187d5aac0401").unwrap(),
+                    first_name: "Marcel \"Markal\"".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: false,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
-                    name: "Elif".to_string(),
+                    id: Uuid::parse_str("8296be5b-4d66-4dc7-bec9-48ea851056cb").unwrap(),
+                    first_name: "Elif".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
-                    name: "Australian".to_string(),
+                    id: Uuid::parse_str("c82cdc91-9152-4201-a229-b2248ab4dcd2").unwrap(),
+                    first_name: "Australian".to_string(),
+                    last_name: "".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },

@@ -12,21 +12,21 @@ sitzung-kind: "{{ sitzung.kind}}"
 #### Anwesende Rätys
 {%~ for rat in raete -%}
 {%- if rat.anwesend -%}
-- {{ rat.name }}
+- {{ rat }}
 {% endif -%}
 {%- endfor ~%}
 
 #### Abwesende Rätys
 {%~ for rat in raete -%}
 {%- if !rat.anwesend && !rat.abgemeldet -%}
-- {{ rat.name }}
+- {{ rat }}
 {% endif -%}
 {%- endfor ~%}
 
 #### Entschuldigte Rätys
 {%~ for rat in raete -%}
 {%- if rat.abgemeldet && !rat.anwesend -%}
-- {{ rat.name }}
+- {{ rat }}
 {% endif -%}
 {%- endfor ~%}
 

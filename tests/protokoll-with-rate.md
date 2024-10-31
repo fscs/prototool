@@ -10,15 +10,15 @@ sitzung-kind: "normal"
 <summary>Anwesenheitsliste</summary>
 
 #### Anwesende Rätys
-- Valentin
-- Jonas "Kooptimus"
-- Marcel "Markal"
+- Valentin 
+- Jonas "Kooptimus" 
+- Marcel "Markal" 
 
 #### Abwesende Rätys
 
 #### Entschuldigte Rätys
-- Elif
-- Australian
+- Elif 
+- Australian 
 
 #### Gäste
 

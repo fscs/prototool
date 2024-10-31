@@ -10,21 +10,28 @@ use super::Sitzung;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct PersonWithAbmeldung {
-    pub name: String,
+    pub id: Uuid,
+    pub first_name: String,
+    pub last_name: String,
     pub abgemeldet: bool,
     pub anwesend: bool,
 }
 
 impl Display for PersonWithAbmeldung {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.name.as_str())
+        f.write_fmt(format_args!(
+            "{} {}",
+            self.first_name.as_str(),
+            self.last_name.as_str()
+        ))
     }
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Person {
     pub id: Uuid,
-    pub name: String,
+    pub first_name: String,
+    pub last_name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -79,7 +86,9 @@ pub fn determine_abgemeldet_räte(
             let abgemeldet = abmeldungen.iter().any(|a| a.person_id == p.id);
 
             PersonWithAbmeldung {
-                name: p.name.to_owned(),
+                id: p.id,
+                first_name: p.first_name.to_owned(),
+                last_name: p.last_name.to_owned(),
                 anwesend: false,
                 abgemeldet,
             }
@@ -99,11 +108,13 @@ mod tests {
         let persons = vec![
             Person {
                 id: Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap(),
-                name: "Valentin Pukhov".to_string(),
+                first_name: "Valentin".to_string(),
+                last_name: "Pukhov".to_string(),
             },
             Person {
                 id: Uuid::parse_str("444e8400-e29b-41d4-a716-446655440000").unwrap(),
-                name: "Florian Schubert".to_string(),
+                first_name: "Florian".to_string(),
+                last_name: "Schubert".to_string(),
             },
         ];
 
@@ -113,12 +124,16 @@ mod tests {
 
         let expected = vec![
             PersonWithAbmeldung {
-                name: "Valentin Pukhov".to_string(),
+                id: Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap(),
+                first_name: "Valentin".to_string(),
+                last_name: "Pukhov".to_string(),
                 abgemeldet: true,
                 anwesend: false,
             },
             PersonWithAbmeldung {
-                name: "Florian Schubert".to_string(),
+                id: Uuid::parse_str("444e8400-e29b-41d4-a716-446655440000").unwrap(),
+                first_name: "Florian".to_string(),
+                last_name: "Schubert".to_string(),
                 abgemeldet: false,
                 anwesend: false,
             },

@@ -121,7 +121,7 @@ impl GenerateCommand {
         let selected = MultiSelect::new("select present räte:", räte.to_vec()).prompt()?;
 
         for rat in räte {
-            rat.anwesend = selected.iter().any(|s| s.name == rat.name);
+            rat.anwesend = selected.iter().any(|s| s.id == rat.id);
         }
 
         Ok(())
