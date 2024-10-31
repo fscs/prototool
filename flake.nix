@@ -77,6 +77,7 @@
           cargo 
           rustc
           rustfmt
+          cargo-semver-checks
         ];
       };
     });
