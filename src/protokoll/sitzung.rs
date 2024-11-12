@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{DateTime, Local};
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -25,7 +25,7 @@ pub enum SitzungKind {
 #[derive(Debug, Deserialize)]
 pub struct Sitzung {
     pub id: Uuid,
-    pub datetime: DateTime<Local>,
+    pub datetime: DateTime<FixedOffset>,
     pub kind: SitzungKind,
     pub tops: Vec<Top>,
 }
@@ -40,9 +40,9 @@ pub struct Antrag {
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum TopKind {
-    #[serde(rename = "normal")]
+    Regularia,
+    Bericht,
     Normal,
-    #[serde(rename = "sonstiges")]
     Verschiedenes,
 }
 
@@ -52,10 +52,14 @@ pub struct Top {
     pub name: String,
     pub anträge: Vec<Antrag>,
     pub kind: TopKind,
-    pub inhalt: String
+    pub inhalt: String,
 }
 
-pub fn fetch_sitzung(api_url: &Url, client: &Client, datetime: DateTime<Local>) -> Result<Sitzung> {
+pub fn fetch_sitzung(
+    api_url: &Url,
+    client: &Client,
+    datetime: DateTime<FixedOffset>,
+) -> Result<Sitzung> {
     let mut endpoint = api_url.join("api/sitzungen/first-after/")?;
     endpoint.set_query(Some(
         format!(

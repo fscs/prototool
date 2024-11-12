@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{DateTime, Local};
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use url::Url;
@@ -9,7 +9,7 @@ pub struct Event {
     #[serde(rename = "summary")]
     pub title: Option<String>,
     pub location: Option<String>,
-    pub start: DateTime<Local>,
+    pub start: DateTime<FixedOffset>,
 }
 
 pub fn fetch_calendar_events(api_url: &Url, client: &Client) -> Result<Vec<Event>> {
@@ -24,7 +24,7 @@ pub fn fetch_calendar_events(api_url: &Url, client: &Client) -> Result<Vec<Event
 
     let events = response
         .json()
-        .context(format!("failed to deserialize events",))?;
+        .context("failed to deserialize events".to_string())?;
 
     Ok(events)
 }

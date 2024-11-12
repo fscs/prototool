@@ -7,3 +7,10 @@
 
 pub mod post;
 pub mod protokoll;
+
+pub use protokoll::{
+    ProtokollTemplate,
+    events::Event,
+    person::{Abmeldung, Person, PersonWithAbmeldung},
+    sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind},
+};

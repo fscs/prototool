@@ -3,7 +3,7 @@ use std::fs::OpenOptions;
 use anyhow::{anyhow, Context, Result};
 use arboard::Clipboard;
 use askama::Template;
-use chrono::{DateTime, Local, NaiveTime};
+use chrono::{DateTime, FixedOffset, Local, NaiveTime};
 use clap::{ArgGroup, Args};
 use inquire::MultiSelect;
 use reqwest::blocking::Client;
@@ -19,7 +19,8 @@ use rustix::stdio::{dup2_stdin, dup2_stdout};
 use super::Runnable;
 use prototool::{
     post,
-    protokoll::{self, events, person, sitzung, PersonWithAbmeldung, ProtokollTemplate, SitzungKind},
+    protokoll::{self, events, person, sitzung},
+    Event, PersonWithAbmeldung, ProtokollTemplate, SitzungKind,
 };
 
 /// Generate a new Protokoll
@@ -72,7 +73,8 @@ impl Runnable for GenerateCommand {
         #[allow(clippy::unwrap_used)]
         let now = chrono::Local::now()
             .with_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
-            .unwrap();
+            .unwrap()
+            .fixed_offset();
 
         let template = self.build_template(&client, now)?;
 
@@ -93,7 +95,7 @@ impl GenerateCommand {
     fn build_template(
         &self,
         client: &Client,
-        sitzung_date: DateTime<Local>,
+        sitzung_date: DateTime<FixedOffset>,
     ) -> Result<ProtokollTemplate> {
         println!("fetching sitzung...");
         let sitzung = sitzung::fetch_sitzung(&self.endpoint_url, client, sitzung_date)?;
@@ -108,7 +110,14 @@ impl GenerateCommand {
         }
 
         println!("fetching events...");
-        let events = events::fetch_calendar_events(&self.endpoint_url, client)?;
+        let events = events::fetch_calendar_events(&self.endpoint_url, client)?
+            .into_iter()
+            .map(|e| Event {
+                title: e.title,
+                location: e.location,
+                start: e.start.with_timezone::<Local>(&Local).into(),
+            })
+            .collect();
 
         return Ok(ProtokollTemplate {
             sitzung,
@@ -129,7 +138,7 @@ impl GenerateCommand {
 
     fn write_to_file(&self, content: &str) -> Result<()> {
         let cwd = std::env::current_dir().context("unable to determine working directory")?;
-        
+
         let markdown_opts = markdown::ParseOptions {
             constructs: markdown::Constructs {
                 frontmatter: true,
@@ -143,8 +152,8 @@ impl GenerateCommand {
 
         let frontmatter = protokoll::find_frontmatter(&mdast).unwrap();
 
-        let timestamp =
-            protokoll::find_protokoll_date(&frontmatter).context("unable to determine protokoll date")?;
+        let timestamp = protokoll::find_protokoll_date(&frontmatter)
+            .context("unable to determine protokoll date")?;
 
         let sitzung_kind = frontmatter.sitzung_kind.unwrap_or(SitzungKind::Normal);
 
@@ -153,7 +162,7 @@ impl GenerateCommand {
             SitzungKind::VV | SitzungKind::WahlVV => "vv-",
             sitzung::SitzungKind::Konsti => "konsti-",
         };
-        
+
         let path = format!(
             "protokolle/{}/{}-{}protokoll.md",
             timestamp.format("%Y"),

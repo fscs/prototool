@@ -4,13 +4,11 @@ use chrono::NaiveDate;
 use markdown::mdast;
 use serde::Deserialize;
 
+use crate::{Event, PersonWithAbmeldung, Sitzung, SitzungKind};
+
 pub mod events;
 pub mod person;
 pub mod sitzung;
-
-pub use events::Event;
-pub use person::{Abmeldung, Person, PersonWithAbmeldung};
-pub use sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -61,9 +59,9 @@ pub struct ProtokollTemplate {
 
 // these are functions available within the template
 mod filters {
-    use chrono::{DateTime, Days, Local, NaiveDate};
+    use chrono::{DateTime, Days, FixedOffset, NaiveDate};
 
-    use super::{Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
+    use crate::{Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops.iter().filter(|e| e.kind == TopKind::Normal).collect();
@@ -71,7 +69,7 @@ mod filters {
         Ok(result)
     }
 
-    pub fn hidden_until_date(datetime: &DateTime<Local>) -> askama::Result<NaiveDate> {
+    pub fn hidden_until_date(datetime: &DateTime<FixedOffset>) -> askama::Result<NaiveDate> {
         let date = datetime.date_naive();
         let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
 
@@ -116,7 +114,7 @@ mod filters {
     pub fn beschlussfaehig_label(raete: &[PersonWithAbmeldung]) -> askama::Result<String> {
         let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
 
-        if anwesend_count == 0 || raete.len() == 0 {
+        if anwesend_count == 0 || raete.is_empty() {
             return Ok("vielleicht beschlussfähig".to_string());
         }
 
@@ -162,10 +160,6 @@ mod tests {
     static PROTOKOLL_WITH_RÄTE: &str = include_str!("../../tests/protokoll-with-rate.md");
     static PROTOKOLL_WITH_RÄTE_NO_BESCHLUSS: &str =
         include_str!("../../tests/protokoll-with-rate-no-beschluss.md");
-
-    // im quite sure we still fuck up the timezone faking and im not sure if we can actually do
-    // anything about it when using DateTime<Local>. ATM this isnt a problem tho because we dont
-    // care about the Time anyway and only the Date matters
 
     fn tz_offset() -> FixedOffset {
         FixedOffset::east_opt(3 * 60 * 60).unwrap()
