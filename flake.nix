@@ -36,10 +36,6 @@
         inherit src;
         strictDeps = true;
 
-        nativeBuildInputs = [
-          pkgs.pkg-config
-        ];
-
         buildInputs =
           []
           ++ lib.optionals pkgs.stdenv.isDarwin [
@@ -49,7 +45,7 @@
 
       cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-      my-crate = craneLib.buildPackage (commonArgs
+      prototool = craneLib.buildPackage (commonArgs
         // {
           inherit cargoArtifacts;
           
@@ -57,19 +53,16 @@
         });
     in {
       checks = {
-        inherit my-crate;
+        inherit prototool;
 
-        my-crate-test = craneLib.cargoTest (commonArgs
+        prototool-test = craneLib.cargoTest (commonArgs
           // {
             inherit cargoArtifacts;
           });
       };
 
-      packages.default = my-crate;
-
-      apps.default = flake-utils.lib.mkApp {
-        drv = my-crate;
-      };
+      packages.default = prototool;
+      hydraJobs.prototool = prototool;
 
       devShells.default = craneLib.devShell {
         checks = self.checks.${system};
