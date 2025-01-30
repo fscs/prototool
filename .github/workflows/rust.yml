@@ -11,7 +11,7 @@ jobs:
       - name: test
         run: cargo test --verbose
   build:
-    name: ${{ matrix.platform.target }}
+    name: build ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.os }}
     needs: test
     strategy:
