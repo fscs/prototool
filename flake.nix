@@ -17,84 +17,77 @@
       flake-utils,
       ...
     }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
+    flake-utils.lib.eachSystem
+      [
+        "aarch64-linux"
+        "x86_64-linux"
+      ]
+      (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
 
-        inherit (pkgs) lib;
+          inherit (pkgs) lib;
 
-        craneLib = crane.mkLib pkgs;
+          craneLib = crane.mkLib pkgs;
 
-        markdownFilter = path: _type: builtins.match ".*md$" path != null;
-        markdownOrCargo = path: type: (markdownFilter path type) || (craneLib.filterCargoSources path type);
+          markdownFilter = path: _type: builtins.match ".*md$" path != null;
+          markdownOrCargo = path: type: (markdownFilter path type) || (craneLib.filterCargoSources path type);
 
-        src = lib.cleanSourceWith {
-          src = craneLib.path ./.;
-          filter = markdownOrCargo;
-        };
+          src = lib.cleanSourceWith {
+            src = craneLib.path ./.;
+            filter = markdownOrCargo;
+          };
 
-        commonArgs = {
-          inherit src;
-          strictDeps = true;
+          commonArgs = {
+            inherit src;
+            strictDeps = true;
 
-          nativeBuildInputs = [
-            pkgs.pkg-config
-          ];
+            buildInputs = [ ];
+          };
 
-          buildInputs =
-            [ ]
-            ++ lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.apple-sdk
-            ];
-        };
+          cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-        cargoArtifacts = craneLib.buildDepsOnly commonArgs;
-
-        my-crate = craneLib.buildPackage (
-          commonArgs
-          // {
-            inherit cargoArtifacts;
-
-            meta.mainProgram = "prototool";
-          }
-        );
-      in
-      {
-        checks = {
-          inherit my-crate;
-
-          my-crate-test = craneLib.cargoTest (
+          prototool-crate = craneLib.buildPackage (
             commonArgs
             // {
               inherit cargoArtifacts;
+
+              meta.mainProgram = "prototool";
             }
           );
-        };
+        in
+        {
+          checks = {
+            inherit prototool-crate;
 
-        packages.default = my-crate;
-
-        apps.default = flake-utils.lib.mkApp {
-          drv = my-crate;
-        };
-
-        devShells = {
-          default = craneLib.devShell {
-            checks = self.checks.${system};
-            nativeBuildInputs = with pkgs; [
-              cargo
-              rustc
-              rustfmt
-              cargo-semver-checks
-            ];
+            my-crate-test = craneLib.cargoTest (
+              commonArgs
+              // {
+                inherit cargoArtifacts;
+              }
+            );
           };
 
-          attic = pkgs.mkShell {
-            nativeBuildInputs = [
-              pkgs.attic-client
-            ];
+          packages.default = prototool-crate;
+
+          devShells = {
+            default = craneLib.devShell {
+              checks = self.checks.${system};
+              nativeBuildInputs = with pkgs; [
+                cargo
+                rustc
+                rustfmt
+                cargo-semver-checks
+              ];
+            };
+
+            attic = pkgs.mkShell {
+              nativeBuildInputs = [
+                pkgs.attic-client
+              ];
+            };
           };
-        };
-      }
-    );
+        }
+      );
 }
