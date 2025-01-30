@@ -29,6 +29,6 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - run: nix develop -c attic login fscs https://attic.hhu-fscs.de ${{ secrets.ATTIC_TOKEN }} 
+      - run: nix develop .#attic -c attic login fscs https://attic.hhu-fscs.de ${{ secrets.ATTIC_TOKEN }} 
       - run: nix build
-      - run: nix develop -c attic push fscs result 
+      - run: nix develop .#attic -c attic push fscs result 
