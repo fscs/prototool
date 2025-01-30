@@ -45,7 +45,7 @@
           buildInputs =
             [ ]
             ++ lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.libiconv
+              pkgs.frameworks.AppKit
             ];
         };
 

@@ -4,10 +4,9 @@ on: [push]
 
 jobs:
   push:
-    name: push ${{ matrix.platform.target }}
+    name: upload ${{ matrix.platform.target }}
     runs-on: ${{ matrix.platform.os }}
     strategy:
-      fail-fast: true
       matrix:
         platform:
           - os: ubuntu-latest
