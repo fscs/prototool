@@ -11,6 +11,10 @@ Keinen Bock mehr Tops aus dem Discord zu copy pasten? Du verlierst immer den Lin
 nix run github:fscs/prototool
 ```
 
+Es gibt auch einen Binary-Cache:
+- `substituters = "https://attic.hhu-fscs.de/fscs-public"`
+- `trusted-public-keys = "fscs-public:MuWSWnGgABFBwdeum/8n4rJxDpzYqhgd/Vm7u3fGMig="`
+
 ## nicht nix
 
 Statische Binaries für Linux, MacOS und Windows gibts in den [Releases](https://github.com/fscs/prototool/releases/latest).

@@ -14,6 +14,11 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
+  nixConfig = {
+    substituters = "https://attic.hhu-fscs.de/fscs-public";
+    trusted-public-keys = "fscs-public:MuWSWnGgABFBwdeum/8n4rJxDpzYqhgd/Vm7u3fGMig=";
+  };
+
   outputs =
     {
       self,
@@ -119,7 +124,6 @@
 
         devShells = {
           default = craneLib.devShell {
-            checks = self.checks.${system};
             nativeBuildInputs = with pkgs; [
               cargo
               rustc
