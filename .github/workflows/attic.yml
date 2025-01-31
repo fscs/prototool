@@ -5,12 +5,12 @@ on: [push]
 jobs:
   push:
     name: upload ${{ matrix.platform.target }}
-    runs-on: ${{ matrix.platform.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform:
-          - os: ubuntu-latest
-            target: x86_64-linux
+          - target: "x86_64-linux"
+          - target: "aarch64-linux"
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v27
@@ -18,5 +18,5 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
       - run: nix develop .#attic -c attic login fscs https://attic.hhu-fscs.de ${{ secrets.ATTIC_TOKEN }} 
-      - run: nix build
+      - run: nix build .#cross-${{ matrix.platform.target }}
       - run: nix develop .#attic -c attic push fscs-public result 
