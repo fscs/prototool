@@ -57,9 +57,11 @@
             crossCraneLib = (crane.mkLib crossPkgs).overrideToolchain (p: p.rust-bin.stable.latest.default);
 
             systemTripleMap = {
-              "x86_64-linux" = "X86_64_UNKNOWN_LINUX_GNU";
-              "aarch64-linux" = "AARCH64_UNKNOWN_LINUX_GNU";
+              "x86_64-linux" = "x86_64-unknown-linux-gnu";
+              "aarch64-linux" = "aarch64-unknown-linux-gnu";
             };
+
+            cargoEnvVarSystem = lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] systemTripleMap.${crossSystem});
 
             crossExpr =
               { stdenv }:
@@ -69,10 +71,8 @@
 
                 nativeBuildInputs = [ stdenv.cc ];
 
-                "CARGO_TARGET_${systemTripleMap.${crossSystem}}_LINKER" = "${stdenv.cc.targetPrefix}cc";
-                CARGO_BUILD_TARGET = (
-                  lib.toLower (lib.replaceStrings [ "_" ] [ "-" ] systemTripleMap.${crossSystem})
-                );
+                "CARGO_TARGET_${cargoEnvVarSystem}_LINKER" = "${stdenv.cc.targetPrefix}cc";
+                CARGO_BUILD_TARGET = systemTripleMap.${crossSystem};
                 HOST_CC = "${stdenv.cc.nativePrefix}cc";
                 TARGET_CC = "${stdenv.cc.targetPrefix}cc";
               };
