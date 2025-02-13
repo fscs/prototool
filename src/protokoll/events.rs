@@ -13,7 +13,7 @@ pub struct Event {
 }
 
 pub fn fetch_calendar_events(api_url: &Url, client: &Client) -> Result<Vec<Event>> {
-    let endpoint = api_url.join("api/calendar/")?;
+    let endpoint = api_url.join("api/calendar/events/")?;
 
     let response = client
         .get(endpoint)
