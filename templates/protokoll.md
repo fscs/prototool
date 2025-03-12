@@ -56,7 +56,15 @@ sitzung-kind: "{{ sitzung.kind}}"
 - Wir können aufgrund der fehlenden Beschlussfähigkeit das Protokoll nicht annehmen
 {% endif -%}
 {% endif -%}
+{%~ if (sitzung|nicht_fristgerechte_antraege).is_empty() -%}
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
+{% else -%}
+- Die folgenden Anträge wurden nicht fristgerecht eingereicht:
+{%- for antrag in sitzung|nicht_fristgerechte_antraege %}
+    - {{ antrag.titel }}    
+{%- endfor ~%}
+- Wir nehmen die unten aufgelistete Topliste {%~ if !(sitzung|nicht_fristgerechte_antraege).is_empty() -%} mit den oben genannten Änderungen{% endif ~%} einstimmig an
+{% endif ~%}
 
 ## Top 1: Berichte, Mail und Post
 

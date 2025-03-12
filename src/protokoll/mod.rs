@@ -61,7 +61,7 @@ pub struct ProtokollTemplate {
 mod filters {
     use chrono::{DateTime, Days, FixedOffset, NaiveDate};
 
-    use crate::{Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
+    use crate::{Antrag, Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
         let result = tops.iter().filter(|e| e.kind == TopKind::Normal).collect();
@@ -138,6 +138,18 @@ mod filters {
 
         return Ok(percent > 0.5);
     }
+
+    pub fn nicht_fristgerechte_antraege(sitzung: &Sitzung) -> askama::Result<Vec<&Antrag>> {
+        let result = sitzung
+            .tops
+            .iter()
+            .map(|top| &top.anträge)
+            .flatten()
+            .filter(|antrag| antrag.created_at > sitzung.antragsfrist)
+            .collect();
+
+        Ok(result)
+    }
 }
 
 #[cfg(test)]
@@ -175,10 +187,15 @@ mod tests {
                     .and_hms_opt(7, 30, 15)
                     .unwrap()
                     .and_local_timezone(tz_offset())
-                    .unwrap()
-                    .into(),
+                    .unwrap(),
                 kind: SitzungKind::Normal,
                 tops: vec![],
+                antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap(),
             },
             raete: vec![],
             events: vec![],
@@ -197,10 +214,15 @@ mod tests {
                     .and_hms_opt(7, 30, 15)
                     .unwrap()
                     .and_local_timezone(tz_offset())
-                    .unwrap()
-                    .into(),
+                    .unwrap(),
                 kind: SitzungKind::VV,
                 tops: vec![],
+                antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap(),
             },
             raete: vec![],
             events: vec![],
@@ -219,8 +241,7 @@ mod tests {
                     .and_hms_opt(7, 30, 15)
                     .unwrap()
                     .and_local_timezone(tz_offset())
-                    .unwrap()
-                    .into(),
+                    .unwrap(),
                 kind: SitzungKind::Normal,
                 tops: vec![
                     Top {
@@ -232,6 +253,12 @@ mod tests {
                             titel: "Blumen für Valentin".to_string(),
                             antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                             begründung: "Weil wir Valentin toll finden".to_string(),
+                            created_at: NaiveDate::from_ymd_opt(2022, 5, 17)
+                                .unwrap()
+                                .and_hms_opt(0, 0, 0)
+                                .unwrap()
+                                .and_local_timezone(tz_offset())
+                                .unwrap(),
                         }],
                     },
                     Top {
@@ -244,15 +271,33 @@ mod tests {
                                 titel: "Tank für Voltzapfanlage".to_string(),
                                 antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                                 begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                                created_at: NaiveDate::from_ymd_opt(2022, 5, 20)
+                                    .unwrap()
+                                    .and_hms_opt(0, 0, 0)
+                                    .unwrap()
+                                    .and_local_timezone(tz_offset())
+                                    .unwrap(),
                             },
                             Antrag {
                                 titel: "Hahn für Voltzapfanlage".to_string(),
                                 antragstext: "Die Fachschaft Informatik beschließt".to_string(),
                                 begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                                created_at: NaiveDate::from_ymd_opt(2022, 5, 21)
+                                    .unwrap()
+                                    .and_hms_opt(12, 0, 0)
+                                    .unwrap()
+                                    .and_local_timezone(tz_offset())
+                                    .unwrap(),
                             },
                         ],
                     },
                 ],
+                antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap(),
             },
             events: vec![],
             raete: vec![],
@@ -271,10 +316,15 @@ mod tests {
                     .and_hms_opt(7, 30, 15)
                     .unwrap()
                     .and_local_timezone(tz_offset())
-                    .unwrap()
-                    .into(),
+                    .unwrap(),
                 kind: SitzungKind::Normal,
                 tops: vec![],
+                antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap(),
             },
             raete: vec![
                 PersonWithAbmeldung {
@@ -329,10 +379,15 @@ mod tests {
                     .and_hms_opt(7, 30, 15)
                     .unwrap()
                     .and_local_timezone(tz_offset())
-                    .unwrap()
-                    .into(),
+                    .unwrap(),
                 kind: SitzungKind::Normal,
                 tops: vec![],
+                antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap()
+                    .and_local_timezone(tz_offset())
+                    .unwrap(),
             },
             raete: vec![
                 PersonWithAbmeldung {

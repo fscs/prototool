@@ -27,7 +27,9 @@ sitzung-kind: "normal"
 - Endzeit: 
 - Wir sind mit n von 0 Rätys vielleicht beschlussfähig
 - Wir nehmen das Protokoll der letzten Sitzung einstimmig an
-- Wir nehmen die unten aufgelistete Topliste einstimmig an
+- Die folgenden Anträge wurden nicht fristgerecht eingereicht:
+    - Hahn für Voltzapfanlage
+- Wir nehmen die unten aufgelistete Topliste mit den oben genannten Änderungen einstimmig an
 
 ## Top 1: Berichte, Mail und Post
 
