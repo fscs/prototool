@@ -60,10 +60,10 @@ pub fn fetch_sitzung(
     client: &Client,
     datetime: DateTime<FixedOffset>,
 ) -> Result<Sitzung> {
-    let mut endpoint = api_url.join("api/sitzungen/first-after/")?;
+    let mut endpoint = api_url.join("api/sitzungen/after/")?;
     endpoint.set_query(Some(
         format!(
-            "timestamp={}",
+            "timestamp={}&Limit=1",
             datetime
                 .to_rfc3339()
                 .replace(":", "%3A")
