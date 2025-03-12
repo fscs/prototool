@@ -15,8 +15,8 @@
   };
 
   nixConfig = {
-    substituters = "https://attic.hhu-fscs.de/fscs-public";
-    trusted-public-keys = "fscs-public:MuWSWnGgABFBwdeum/8n4rJxDpzYqhgd/Vm7u3fGMig=";
+    extra-substituters = "https://attic.hhu-fscs.de/fscs-public";
+    extra-trusted-public-keys = "fscs-public:MuWSWnGgABFBwdeum/8n4rJxDpzYqhgd/Vm7u3fGMig=";
   };
 
   outputs =
