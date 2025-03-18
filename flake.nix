@@ -21,7 +21,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       crane,
       rust-overlay,
@@ -116,7 +115,7 @@
 
         packages =
           {
-            default = local-prototool-crate;
+            default = crossBuildFor system;
           }
           // (lib.listToAttrs (
             map (crossSystem: lib.nameValuePair "cross-${crossSystem}" (crossBuildFor crossSystem)) systems
