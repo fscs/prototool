@@ -29,6 +29,8 @@ sitzung-kind: "vv"
 - Wir nehmen das Protokoll der letzten VV einstimmig an
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
+_Falls Begriffe unklar sind, verweisen wir auf unser [Abkürzungsverzeichnis](https://fscs.hhu.de/wtf)_
+
 ## Top 1: Berichte, Mail und Post
 
 ### Berichte

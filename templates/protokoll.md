@@ -66,6 +66,8 @@ sitzung-kind: "{{ sitzung.kind}}"
 - Wir nehmen die unten aufgelistete Topliste {%~ if !(sitzung|nicht_fristgerechte_antraege).is_empty() -%} mit den oben genannten Änderungen{% endif ~%} einstimmig an
 {% endif ~%}
 
+_Falls Begriffe unklar sind, verweisen wir auf unser [Abkürzungsverzeichnis](https://fscs.hhu.de/wtf)_
+
 ## Top 1: Berichte, Mail und Post
 
 ### Berichte

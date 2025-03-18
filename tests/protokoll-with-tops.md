@@ -31,6 +31,8 @@ sitzung-kind: "normal"
     - Hahn für Voltzapfanlage
 - Wir nehmen die unten aufgelistete Topliste mit den oben genannten Änderungen einstimmig an
 
+_Falls Begriffe unklar sind, verweisen wir auf unser [Abkürzungsverzeichnis](https://fscs.hhu.de/wtf)_
+
 ## Top 1: Berichte, Mail und Post
 
 ### Berichte

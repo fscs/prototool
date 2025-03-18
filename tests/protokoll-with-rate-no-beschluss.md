@@ -35,6 +35,8 @@ sitzung-kind: "normal"
 - Wir können aufgrund der fehlenden Beschlussfähigkeit das Protokoll nicht annehmen
 - Wir nehmen die unten aufgelistete Topliste einstimmig an
 
+_Falls Begriffe unklar sind, verweisen wir auf unser [Abkürzungsverzeichnis](https://fscs.hhu.de/wtf)_
+
 ## Top 1: Berichte, Mail und Post
 
 ### Berichte
