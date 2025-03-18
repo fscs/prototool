@@ -12,12 +12,8 @@ pub struct PostTemplate {
     date_machine: String,
 }
 
-fn find_content_dir(root: &Path, lang: &str) -> PathBuf {
-    let mut result = root.to_owned();
-    result.push("content");
-    result.push(lang);
-
-    result
+fn find_content_dir(root: &Path) -> PathBuf {
+    root.join("content")
 }
 
 pub fn create_post(
@@ -27,13 +23,15 @@ pub fn create_post(
     target: &str,
     force: bool,
 ) -> Result<PathBuf> {
-    let content_dir = find_content_dir(root, lang);
+    let content_dir = find_content_dir(root);
 
     if !content_dir.exists() {
         bail!("content dir doesnt exist yet")
     }
 
-    let target_path = content_dir.join(target);
+    let mut target_path = content_dir.join(target);
+
+    target_path.set_extension(format!("{}.md", lang));
 
     let Some(category_path) = target_path.parent() else {
         bail!("unable to determine category path")
@@ -90,7 +88,7 @@ mod tests {
     fn content_dir_doesnt_exist() {
         let tmpdir = tempdir().unwrap();
 
-        let result = super::create_post("", tmpdir.path(), "de", "news/test.md", false);
+        let result = super::create_post("", tmpdir.path(), "de", "news/test", false);
 
         assert!(result.is_err())
     }
@@ -98,13 +96,13 @@ mod tests {
     #[test]
     fn category_doesnt_exist() {
         let tmpdir = tempdir().unwrap();
-        let content_dir = tmpdir.path().join("content/de/");
+        let content_dir = tmpdir.path().join("content/");
 
         fs::create_dir_all(&content_dir).unwrap();
 
-        let result = super::create_post("", tmpdir.path(), "de", "news/test.md", false).unwrap();
+        let result = super::create_post("", tmpdir.path(), "de", "news/test", false).unwrap();
 
-        let expected = content_dir.join("news/test.md");
+        let expected = content_dir.join("news/test.de.md");
         assert_eq!(result, expected)
     }
 
