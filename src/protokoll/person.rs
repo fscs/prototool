@@ -101,13 +101,11 @@ mod tests {
         let persons = vec![
             Person {
                 id: Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap(),
-                first_name: "Valentin".to_string(),
-                last_name: "Pukhov".to_string(),
+                full_name: "Valentin Pukhov".to_string(),
             },
             Person {
                 id: Uuid::parse_str("444e8400-e29b-41d4-a716-446655440000").unwrap(),
-                first_name: "Florian".to_string(),
-                last_name: "Schubert".to_string(),
+                full_name: "Florian Schubert".to_string(),
             },
         ];
 
@@ -118,15 +116,13 @@ mod tests {
         let expected = vec![
             PersonWithAbmeldung {
                 id: Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap(),
-                first_name: "Valentin".to_string(),
-                last_name: "Pukhov".to_string(),
+                full_name: "Valentin Pukhov".to_string(),
                 abgemeldet: true,
                 anwesend: false,
             },
             PersonWithAbmeldung {
                 id: Uuid::parse_str("444e8400-e29b-41d4-a716-446655440000").unwrap(),
-                first_name: "Florian".to_string(),
-                last_name: "Schubert".to_string(),
+                full_name: "Florian Schubert".to_string(),
                 abgemeldet: false,
                 anwesend: false,
             },
