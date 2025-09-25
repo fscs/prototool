@@ -12,5 +12,5 @@ pub use protokoll::{
     ProtokollTemplate,
     events::Event,
     person::{Abmeldung, Person, PersonWithAbmeldung},
-    sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind},
+    sitzung::{Antrag, Sitzung, SitzungTyp, Top, TopTyp},
 };

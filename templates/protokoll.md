@@ -3,7 +3,7 @@ title: "{{ sitzung|protokoll_title }}"
 date: "{{ sitzung.datetime.format("%Y-%m-%d") }}"
 draft: true
 hiddenUntil: "{{ (sitzung.datetime|hidden_until_date).format("%Y-%m-%d") }}"
-sitzung-kind: "{{ sitzung.kind}}"
+sitzung-kind: "{{ sitzung.typ}}"
 ---
 
 <details>
@@ -30,7 +30,7 @@ sitzung-kind: "{{ sitzung.kind}}"
 {% endif -%}
 {%- endfor ~%}
 
-{%~ if sitzung.kind == SitzungKind::VV || sitzung.kind == SitzungKind::WahlVV -%}
+{%~ if sitzung.typ == SitzungTyp::VV || sitzung.typ == SitzungTyp::WahlVV -%}
 #### Weitere Studis
 {%- else -%}
 #### Gäste
@@ -44,7 +44,7 @@ sitzung-kind: "{{ sitzung.kind}}"
 - Protokoll: 
 - Startzeit: 
 - Endzeit: {# this comment is a hack to sneak in a whitespace at the end of the line #}
-{%~ if sitzung.kind == SitzungKind::VV || sitzung.kind == SitzungKind::WahlVV -%}
+{%~ if sitzung.typ == SitzungTyp::VV || sitzung.typ == SitzungTyp::WahlVV -%}
 - Wir sind mit n Studierenden vorläufig beschlussfähig
 - Wir nehmen das Protokoll der letzten VV einstimmig an
 {% else -%}
@@ -84,11 +84,11 @@ _Top endet um T Uhr._
 
 {{top.inhalt}}
 
-{%~ for antrag in top.anträge ~%}
+{%~ for antrag in top.antraege ~%}
 
 ### Antrag: {{ antrag.titel }}
 
-{{ antrag.begründung }}
+{{ antrag.begruendung }}
 
 ```vote-success
 {{antrag.antragstext}}

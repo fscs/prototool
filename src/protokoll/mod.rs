@@ -4,7 +4,7 @@ use chrono::NaiveDate;
 use markdown::mdast;
 use serde::Deserialize;
 
-use crate::{Event, PersonWithAbmeldung, Sitzung, SitzungKind};
+use crate::{Event, PersonWithAbmeldung, Sitzung, SitzungTyp};
 
 pub mod events;
 pub mod person;
@@ -15,7 +15,7 @@ pub mod sitzung;
 pub struct ProtokollFrontmatter {
     pub date: Option<NaiveDate>,
     pub lastmod: Option<NaiveDate>,
-    pub sitzung_kind: Option<SitzungKind>,
+    pub sitzung_kind: Option<SitzungTyp>,
 }
 
 pub fn find_frontmatter(protokoll: &mdast::Node) -> Result<ProtokollFrontmatter> {
@@ -61,10 +61,10 @@ pub struct ProtokollTemplate {
 mod filters {
     use chrono::{DateTime, Days, FixedOffset, NaiveDate};
 
-    use crate::{Antrag, Event, PersonWithAbmeldung, Sitzung, SitzungKind, Top, TopKind};
+    use crate::{Antrag, Event, PersonWithAbmeldung, Sitzung, SitzungTyp, Top, TopTyp};
 
     pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
-        let result = tops.iter().filter(|e| e.kind == TopKind::Normal).collect();
+        let result = tops.iter().filter(|e| e.typ == TopTyp::Normal).collect();
 
         Ok(result)
     }
@@ -89,9 +89,9 @@ mod filters {
     }
 
     pub fn protokoll_title(sitzung: &Sitzung) -> askama::Result<String> {
-        let prefix = match &sitzung.kind {
-            SitzungKind::VV | SitzungKind::WahlVV => "VV-Protokoll",
-            SitzungKind::Konsti => "Konsti-Protokoll",
+        let prefix = match &sitzung.typ {
+            SitzungTyp::VV | SitzungTyp::WahlVV => "VV-Protokoll",
+            SitzungTyp::Konsti => "Konsti-Protokoll",
             _ => "Protokoll",
         };
 
@@ -143,9 +143,9 @@ mod filters {
         let result = sitzung
             .tops
             .iter()
-            .map(|top| &top.anträge)
+            .map(|top| &top.antraege)
             .flatten()
-            .filter(|antrag| antrag.created_at > sitzung.antragsfrist)
+            .filter(|antrag| antrag.erstellt_am > sitzung.antragsfrist)
             .collect();
 
         Ok(result)
@@ -157,7 +157,7 @@ mod filters {
 mod tests {
     use super::{
         person::PersonWithAbmeldung,
-        sitzung::{Antrag, Sitzung, SitzungKind, Top, TopKind},
+        sitzung::{Antrag, Sitzung, SitzungTyp, Top, TopTyp},
     };
 
     use super::ProtokollTemplate;
@@ -188,7 +188,7 @@ mod tests {
                     .unwrap()
                     .and_local_timezone(tz_offset())
                     .unwrap(),
-                kind: SitzungKind::Normal,
+                typ: SitzungTyp::Normal,
                 tops: vec![],
                 antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
                     .unwrap()
@@ -215,7 +215,7 @@ mod tests {
                     .unwrap()
                     .and_local_timezone(tz_offset())
                     .unwrap(),
-                kind: SitzungKind::VV,
+                typ: SitzungTyp::VV,
                 tops: vec![],
                 antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
                     .unwrap()
@@ -242,18 +242,18 @@ mod tests {
                     .unwrap()
                     .and_local_timezone(tz_offset())
                     .unwrap(),
-                kind: SitzungKind::Normal,
+                typ: SitzungTyp::Normal,
                 tops: vec![
                     Top {
                         name: "Blumen für Valentin".to_string(),
                         weight: 1,
-                        kind: TopKind::Normal,
+                        typ: TopTyp::Normal,
                         inhalt: "ich weiß aber nicht wo der nächste blumenladen ist".to_string(),
-                        anträge: vec![Antrag {
+                        antraege: vec![Antrag {
                             titel: "Blumen für Valentin".to_string(),
                             antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                            begründung: "Weil wir Valentin toll finden".to_string(),
-                            created_at: NaiveDate::from_ymd_opt(2022, 5, 17)
+                            begruendung: "Weil wir Valentin toll finden".to_string(),
+                            erstellt_am: NaiveDate::from_ymd_opt(2022, 5, 17)
                                 .unwrap()
                                 .and_hms_opt(0, 0, 0)
                                 .unwrap()
@@ -264,14 +264,14 @@ mod tests {
                     Top {
                         name: "Volt Zapfanlage".to_string(),
                         weight: 2,
-                        kind: TopKind::Normal,
+                        typ: TopTyp::Normal,
                         inhalt: "volt volt volt".to_string(),
-                        anträge: vec![
+                        antraege: vec![
                             Antrag {
                                 titel: "Tank für Voltzapfanlage".to_string(),
                                 antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                                begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                                created_at: NaiveDate::from_ymd_opt(2022, 5, 20)
+                                begruendung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                                erstellt_am: NaiveDate::from_ymd_opt(2022, 5, 20)
                                     .unwrap()
                                     .and_hms_opt(0, 0, 0)
                                     .unwrap()
@@ -281,8 +281,8 @@ mod tests {
                             Antrag {
                                 titel: "Hahn für Voltzapfanlage".to_string(),
                                 antragstext: "Die Fachschaft Informatik beschließt".to_string(),
-                                begründung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
-                                created_at: NaiveDate::from_ymd_opt(2022, 5, 21)
+                                begruendung: "Volt aus dem Hahn > Volt aus der Dose".to_string(),
+                                erstellt_am: NaiveDate::from_ymd_opt(2022, 5, 21)
                                     .unwrap()
                                     .and_hms_opt(12, 0, 0)
                                     .unwrap()
@@ -317,7 +317,7 @@ mod tests {
                     .unwrap()
                     .and_local_timezone(tz_offset())
                     .unwrap(),
-                kind: SitzungKind::Normal,
+                typ: SitzungTyp::Normal,
                 tops: vec![],
                 antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
                     .unwrap()
@@ -329,31 +329,31 @@ mod tests {
             raete: vec![
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("22b6b758-741c-429f-9e96-65fc289fcfef").unwrap(),
-                    full_name: "Valentin".to_string(),
+                    name: "Valentin".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("f4e53c93-fc62-4977-a559-cb4d375f0c0e").unwrap(),
-                    full_name: "Jonas \"Kooptimus\"".to_string(),
+                    name: "Jonas \"Kooptimus\"".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("b3f8d4b2-69c0-420c-b606-187d5aac0401").unwrap(),
-                    full_name: "Marcel \"Markal\"".to_string(),
+                    name: "Marcel \"Markal\"".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("8296be5b-4d66-4dc7-bec9-48ea851056cb").unwrap(),
-                    full_name: "Elif".to_string(),
+                    name: "Elif".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("c82cdc91-9152-4201-a229-b2248ab4dcd2").unwrap(),
-                    full_name: "Australian".to_string(),
+                    name: "Australian".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
@@ -375,7 +375,7 @@ mod tests {
                     .unwrap()
                     .and_local_timezone(tz_offset())
                     .unwrap(),
-                kind: SitzungKind::Normal,
+                typ: SitzungTyp::Normal,
                 tops: vec![],
                 antragsfrist: NaiveDate::from_ymd_opt(2022, 5, 20)
                     .unwrap()
@@ -387,31 +387,31 @@ mod tests {
             raete: vec![
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("22b6b758-741c-429f-9e96-65fc289fcfef").unwrap(),
-                    full_name: "Valentin".to_string(),
+                    name: "Valentin".to_string(),
                     abgemeldet: false,
                     anwesend: true,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("f4e53c93-fc62-4977-a559-cb4d375f0c0e").unwrap(),
-                    full_name: "Jonas \"Kooptimus\"".to_string(),
+                    name: "Jonas \"Kooptimus\"".to_string(),
                     abgemeldet: false,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("b3f8d4b2-69c0-420c-b606-187d5aac0401").unwrap(),
-                    full_name: "Marcel \"Markal\"".to_string(),
+                    name: "Marcel \"Markal\"".to_string(),
                     abgemeldet: false,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("8296be5b-4d66-4dc7-bec9-48ea851056cb").unwrap(),
-                    full_name: "Elif".to_string(),
+                    name: "Elif".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },
                 PersonWithAbmeldung {
                     id: Uuid::parse_str("c82cdc91-9152-4201-a229-b2248ab4dcd2").unwrap(),
-                    full_name: "Australian".to_string(),
+                    name: "Australian".to_string(),
                     abgemeldet: true,
                     anwesend: false,
                 },

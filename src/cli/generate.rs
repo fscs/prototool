@@ -20,7 +20,7 @@ use super::Runnable;
 use prototool::{
     post,
     protokoll::{self, events, person, sitzung},
-    Event, PersonWithAbmeldung, ProtokollTemplate, SitzungKind,
+    Event, PersonWithAbmeldung, ProtokollTemplate, SitzungTyp,
 };
 
 /// Generate a new Protokoll
@@ -155,12 +155,12 @@ impl GenerateCommand {
         let timestamp = protokoll::find_protokoll_date(&frontmatter)
             .context("unable to determine protokoll date")?;
 
-        let sitzung_kind = frontmatter.sitzung_kind.unwrap_or(SitzungKind::Normal);
+        let sitzung_kind = frontmatter.sitzung_kind.unwrap_or(SitzungTyp::Normal);
 
         let prefix = match sitzung_kind {
-            SitzungKind::Normal | SitzungKind::Ersatz | SitzungKind::Dringlichkeit => "",
-            SitzungKind::VV | SitzungKind::WahlVV => "vv-",
-            sitzung::SitzungKind::Konsti => "konsti-",
+            SitzungTyp::Normal | SitzungTyp::Ersatz | SitzungTyp::Dringlichkeit => "",
+            SitzungTyp::VV | SitzungTyp::WahlVV => "vv-",
+            sitzung::SitzungTyp::Konsti => "konsti-",
         };
 
         let path = format!(

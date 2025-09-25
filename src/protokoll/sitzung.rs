@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 #[derive(Debug, Deserialize, PartialEq, Eq, strum::Display, Clone)]
 #[serde(rename_all = "lowercase")]
-pub enum SitzungKind {
+pub enum SitzungTyp {
     #[strum(to_string = "normal")]
     Normal,
     #[strum(to_string = "vv")]
@@ -26,7 +26,7 @@ pub enum SitzungKind {
 pub struct Sitzung {
     pub id: Uuid,
     pub datetime: DateTime<FixedOffset>,
-    pub kind: SitzungKind,
+    pub typ: SitzungTyp,
     pub tops: Vec<Top>,
     pub antragsfrist: DateTime<FixedOffset>,
 }
@@ -35,13 +35,13 @@ pub struct Sitzung {
 pub struct Antrag {
     pub titel: String,
     pub antragstext: String,
-    pub begründung: String,
-    pub created_at: DateTime<FixedOffset>,
+    pub begruendung: String,
+    pub erstellt_am: DateTime<FixedOffset>,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "lowercase")]
-pub enum TopKind {
+pub enum TopTyp {
     Regularia,
     Bericht,
     Normal,
@@ -52,8 +52,8 @@ pub enum TopKind {
 pub struct Top {
     pub weight: i64,
     pub name: String,
-    pub anträge: Vec<Antrag>,
-    pub kind: TopKind,
+    pub antraege: Vec<Antrag>,
+    pub typ: TopTyp,
     pub inhalt: String,
 }
 
