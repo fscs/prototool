@@ -63,20 +63,26 @@ mod filters {
 
     use crate::{Antrag, Event, PersonWithAbmeldung, Sitzung, SitzungTyp, Top, TopTyp};
 
-    pub fn normal_tops(tops: &[Top]) -> askama::Result<Vec<&Top>> {
+    pub fn normal_tops<'a>(
+        tops: &'a [Top],
+        _: &dyn askama::Values,
+    ) -> askama::Result<Vec<&'a Top>> {
         let result = tops.iter().filter(|e| e.typ == TopTyp::Normal).collect();
 
         Ok(result)
     }
 
-    pub fn hidden_until_date(datetime: &DateTime<FixedOffset>) -> askama::Result<NaiveDate> {
+    pub fn hidden_until_date(
+        datetime: &DateTime<FixedOffset>,
+        _: &dyn askama::Values,
+    ) -> askama::Result<NaiveDate> {
         let date = datetime.date_naive();
         let result = date.checked_add_days(Days::new(4)).unwrap_or(date);
 
         Ok(result)
     }
 
-    pub fn event_format(event: &Event) -> askama::Result<String> {
+    pub fn event_format(event: &Event, _: &dyn askama::Values) -> askama::Result<String> {
         let result = format!(
             "{} {} {} Uhr {}",
             event.start.format("%d.%m."),
@@ -88,7 +94,7 @@ mod filters {
         Ok(result)
     }
 
-    pub fn protokoll_title(sitzung: &Sitzung) -> askama::Result<String> {
+    pub fn protokoll_title(sitzung: &Sitzung, _: &dyn askama::Values) -> askama::Result<String> {
         let prefix = match &sitzung.typ {
             SitzungTyp::VV | SitzungTyp::WahlVV => "VV-Protokoll",
             SitzungTyp::Konsti => "Konsti-Protokoll",
@@ -100,7 +106,10 @@ mod filters {
         Ok(result)
     }
 
-    pub fn anwesende_raete_label(raete: &[PersonWithAbmeldung]) -> askama::Result<String> {
+    pub fn anwesende_raete_label(
+        raete: &[PersonWithAbmeldung],
+        _: &dyn askama::Values,
+    ) -> askama::Result<String> {
         let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
 
         if anwesend_count == 0 {
@@ -111,7 +120,10 @@ mod filters {
         }
     }
 
-    pub fn beschlussfaehig_label(raete: &[PersonWithAbmeldung]) -> askama::Result<String> {
+    pub fn beschlussfaehig_label(
+        raete: &[PersonWithAbmeldung],
+        _: &dyn askama::Values,
+    ) -> askama::Result<String> {
         let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
 
         if anwesend_count == 0 || raete.is_empty() {
@@ -127,7 +139,10 @@ mod filters {
         }
     }
 
-    pub fn beschlussfaehig(raete: &[PersonWithAbmeldung]) -> askama::Result<bool> {
+    pub fn beschlussfaehig(
+        raete: &[PersonWithAbmeldung],
+        _: &dyn askama::Values,
+    ) -> askama::Result<bool> {
         let anwesend_count = raete.iter().filter(|r| r.anwesend).count();
 
         if anwesend_count == 0 {
@@ -139,7 +154,10 @@ mod filters {
         return Ok(percent > 0.5);
     }
 
-    pub fn nicht_fristgerechte_antraege(sitzung: &Sitzung) -> askama::Result<Vec<&Antrag>> {
+    pub fn nicht_fristgerechte_antraege<'a>(
+        sitzung: &'a Sitzung,
+        _: &dyn askama::Values,
+    ) -> askama::Result<Vec<&'a Antrag>> {
         let result = sitzung
             .tops
             .iter()
